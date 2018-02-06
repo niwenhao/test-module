@@ -1,0 +1,44 @@
+group 'jp.co.nri.openapi'
+version '0.1'
+
+buildscript {
+    ext.kotlin_version = '1.1.3-2'
+
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+apply plugin: 'kotlin'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-groovy-templates', version: '1.5.9.RELEASE'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: '1.5.9.RELEASE'
+    compile group: 'mysql', name: 'mysql-connector-java', version: '6.0.6'
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+compileTestKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+buildscript {
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:1.5.9.RELEASE"
+    }
+}
+apply plugin: "org.springframework.boot"
