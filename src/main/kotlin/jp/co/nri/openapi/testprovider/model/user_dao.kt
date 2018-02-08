@@ -58,8 +58,9 @@ open class UserDaoImpl(
     @Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED)
     override fun remove(id: Long):ProviderUser? {
         return em.find(ProviderUser::class.java, id)?.let {  e ->
+            val r = ProviderUser(e.id, e.clientKey, e.userID, e.userName, e.password, listOf())
             em.remove(e)
-            e
+            r
         }
     }
 }

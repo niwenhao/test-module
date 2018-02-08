@@ -2,63 +2,7 @@ import * as React from "react"
 import { BrowserRouter as Router, Route, Link, Redirect } from "react-router-dom"
 import { RouteComponentProps } from 'react-router'
 
-import * as Backbone from 'backbone'
-
-interface User {
-  userID: string
-  userName: string
-  password: string
-}
-class UserModel extends Backbone.Model implements User {
-  constructor(attrs?: User, options?: any) {
-    super(attrs || {}, options)
-  }
-  get userID() : string {
-    return this.get('userID')
-  }
-
-  set userID(v: string) {
-    this.set('userID', v)
-  }
-
-  get userName(): string {
-    return this.get('userName')
-  }
-
-  set userName(v: string) {
-    this.set('userName', v)
-  }
-
-  get password(): string {
-    return this.get('password')
-  }
-  set password(v: string) {
-    this.set('password', v)
-  }
-}
-
-class UserCollection extends Backbone.Collection<UserModel> {
-  url = "/api/users"
-
-  model = UserModel
-}
-
-class ClientModel extends Backbone.Model {
-  url = () => "/api/adminclient"
-
-  get clientKey(): string {
-    return this.get('clientKey')
-  }
-  set clientKey(v: string) {
-    this.set('clientKey', v)
-  }
-  get clientName(): string {
-    return this.get('clientName')
-  }
-  set clientName(v: string) {
-    this.set('clientName', v)
-  }
-}
+import { User, UserModel, UserCollection, ClientModel } from './common/entities'
 
 interface UserEditorState {
   userID: string
@@ -338,40 +282,44 @@ export class UserMgr
       return (
         <div>
           <h1>ユーザメインテナンス</h1>
-          <span>
-            <div>
+          <div>
             <label>クライアント</label>
             <input type="text" readOnly={true} value={this.state.client}/>
             <button type="button" onClick={ () => this.logout() }>ログアウト</button>
-            </div>
-            <div>
-              <button type="button" onClick={ () => this.newUser() }>追加</button>
-              <button type="button" onClick={ () => this.refreshUserList() }>再取得</button>
-              <UserList users={ this.state.users } onSelect={ u => this.selectUser(u) } onShowAPI={ u => this.showApi(u) }/>
-            </div>
-          </span>
-          <span>
-            <div>
-              <button type="button" onClick={ () => this.clearAllHistory() }>全履歴クリア</button>
-              {
-                this.state.action == UserMgrAction.NONE ? 
-                  <div/> 
-                  : 
-                  this.state.action == UserMgrAction.NEW ? 
-                    <UserNew onCancel={() => this.setState({ action: UserMgrAction.NONE })}
-                             onSave={(id, name, pwd) => { this.createUser(id, name, pwd)}}
-                             />
-                    :
-                    <UserEditor user={this.state.currentUser!}
-                                onCancel={() => this.setState({ action: UserMgrAction.NONE })}
-                                onClearHist={(u) => this.clearUserHistory(u)}
-                                onUpdate={() => this.refreshUserList()}
-                                onRemove={(u) => this.removeUser(u)}
+            <button type="button" onClick={ () => this.clearAllHistory() }>全履歴クリア</button>
+          </div>
+          <table>
+            <tr>
+              <td>
+                <div>
+                  <button type="button" onClick={ () => this.newUser() }>追加</button>
+                  <button type="button" onClick={ () => this.refreshUserList() }>再取得</button>
+                  <UserList users={ this.state.users } onSelect={ u => this.selectUser(u) } onShowAPI={ u => this.showApi(u) }/>
+                </div>
+              </td>
+              <td>
+                <div>
+                  {
+                    this.state.action == UserMgrAction.NONE ? 
+                      <div/> 
+                      : 
+                      this.state.action == UserMgrAction.NEW ? 
+                        <UserNew onCancel={() => this.setState({ action: UserMgrAction.NONE })}
+                                onSave={(id, name, pwd) => { this.createUser(id, name, pwd)}}
                                 />
+                        :
+                        <UserEditor user={this.state.currentUser!}
+                                    onCancel={() => this.setState({ action: UserMgrAction.NONE })}
+                                    onClearHist={(u) => this.clearUserHistory(u)}
+                                    onUpdate={() => this.refreshUserList()}
+                                    onRemove={(u) => this.removeUser(u)}
+                                    />
 
-              }
-            </div>
-          </span>
+                  }
+                </div>
+              </td>
+            </tr>
+          </table>
         </div>
       )
     } else {

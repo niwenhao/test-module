@@ -1,9 +1,11 @@
 package jp.co.nri.openapi.testprovider.controller
 
 import jp.co.nri.openapi.testprovider.Const
+import jp.co.nri.openapi.testprovider.model.ApiDao
 import jp.co.nri.openapi.testprovider.model.Client
 import jp.co.nri.openapi.testprovider.model.ClientDao
 import jp.co.nri.openapi.testprovider.model.UserDao
+import jp.co.nri.openapi.testprovider.model.entity.ProviderApi
 import jp.co.nri.openapi.testprovider.model.entity.ProviderUser
 import org.springframework.web.bind.annotation.*
 import javax.annotation.Resource
@@ -33,7 +35,7 @@ class ClientApiController(
 }
 
 @RestController
-class UserApiController(
+class UserServiceController(
         @Resource
         val userDao: UserDao
 ) {
@@ -85,8 +87,21 @@ class UserApiController(
             id: Long
     ): ProviderUser? {
         return (session.getAttribute(Const.SK_CLIENT) as Client?)?.let { client ->
-            val u = userDao.remove(id)
-            ProviderUser(id, u?.clientKey, u?.userID, u?.userName, u?.password, listOf())
+            userDao.remove(id)
         }
+    }
+}
+
+@RestController
+@RequestMapping("/api/users/{userId}")
+class ApiServiceController(
+        val apiDao: ApiDao
+) {
+    @RequestMapping("/apis", method = arrayOf(RequestMethod.GET))
+    fun list(
+            @PathVariable
+            userId: Long
+    ): List<ProviderApi> {
+        return apiDao.getUserApiList(userId)
     }
 }

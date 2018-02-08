@@ -25,19 +25,19 @@ data class ProviderUser(
 data class ProviderApi(
         @Id
         @GeneratedValue
-        var id: Long,
+        var id: Long?,
         @ManyToOne()
-        var providerUser: ProviderUser,
+        var providerUser: ProviderUser?,
         @Column(length=128)
-        var apiPath: String,
+        var apiPath: String?,
         @Column(length=128)
-        var apiName: String,
+        var apiName: String?,
         @Column(length=512*1024, columnDefinition = "LONG")
-        var conditionJson: String,
+        var conditionJson: String?,
         @Column(length=512*1024, columnDefinition = "LONG")
-        var responseJson: String,
+        var responseJson: String?,
         @OneToMany(targetEntity = ProviderApiHist::class)
-        var providerApiHists: List<ProviderApiHist>
+        var providerApiHists: List<ProviderApiHist>?
 )
 
 @Entity
@@ -45,13 +45,13 @@ data class ProviderApi(
 data class ProviderApiHist(
         @Id
         @GeneratedValue
-        var id: Long,
+        var id: Long?,
         @ManyToOne()
-        var providerApi: ProviderApi,
+        var providerApi: ProviderApi?,
         @Column
-        var accessTime: Long,
+        var accessTime: Long?,
         @Column(length=512*1024, columnDefinition = "LONG")
-        var requestJson: String,
+        var requestJson: String?,
         @Column(length=512*1024, columnDefinition = "LONG")
-        var responseJson: String
+        var responseJson: String?
 )
