@@ -73,7 +73,7 @@ class AuthorizeAdapter(
             request.client_id?.let { client_id ->
                 clientDao.findByClientKey(client_id)?.let { client ->
                     userDao.login(client_id, userId, password)?.let { user ->
-                        ModelAndView(MappingJackson2JsonView(), mapOf("resource_owner" to user.userID, "" to Base64.getEncoder().encodeToString(user.userID.toByteArray())))
+                        ModelAndView(MappingJackson2JsonView(), mapOf("resource_owner" to user.userID, "" to Base64.getEncoder().encodeToString(user.userID!!.toByteArray())))
                     } ?: {
                         ModelAndView("display", mapOf(
                                 "sessionId" to sessionId,

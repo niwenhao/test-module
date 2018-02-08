@@ -10,8 +10,8 @@ function MainPane(props: any) {
       <BrowserRouter>
         <Switch>
           <Route exact path="/test-data-manager/login" component={UserMgr}/>
-          <Route exact path="/test-data-manager/login/user/:uid/api" component={ApiMgr}/>
-          <Route exact path="/test-data-manager/login/user/:uid/api/:aid/hist" component={HistMgr}/>
+          <Route exact path="/test-data-manager/login/users/:uid/apis" component={ApiMgr}/>
+          <Route exact path="/test-data-manager/login/users/:uid/apis/:aid/history" component={HistMgr}/>
         </Switch>
       </BrowserRouter>
   )

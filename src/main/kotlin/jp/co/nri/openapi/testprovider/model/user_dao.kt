@@ -15,6 +15,7 @@ interface UserDao {
     fun find(id: Long): ProviderUser?
     fun create(user: ProviderUser)
     fun update(user: ProviderUser)
+    fun remove(id: Long):ProviderUser?
     fun login(clientKey: String, userId: String, password: String): ProviderUser?
 }
 
@@ -45,12 +46,20 @@ open class UserDaoImpl(
 
     @Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED)
     override fun create(user: ProviderUser) {
-        val u = ProviderUser(null, user.clientKey, user.userID, user.userName, user.password, arrayListOf())
+        val u = ProviderUser(null, user.clientKey, user.userID, user.userName, user.password, listOf())
         em.persist(u)
     }
 
     @Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED)
     override fun update(user: ProviderUser) {
         em.persist(em.merge(user))
+    }
+
+    @Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED)
+    override fun remove(id: Long):ProviderUser? {
+        return em.find(ProviderUser::class.java, id)?.let {  e ->
+            em.remove(e)
+            e
+        }
     }
 }

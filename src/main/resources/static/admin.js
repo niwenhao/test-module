@@ -251,8 +251,8 @@ function MainPane(props) {
     return (React.createElement(react_router_dom_1.BrowserRouter, null,
         React.createElement(react_router_dom_1.Switch, null,
             React.createElement(react_router_dom_1.Route, { exact: true, path: "/test-data-manager/login", component: usermgr_1.UserMgr }),
-            React.createElement(react_router_dom_1.Route, { exact: true, path: "/test-data-manager/login/user/:uid/api", component: apimgr_1.ApiMgr }),
-            React.createElement(react_router_dom_1.Route, { exact: true, path: "/test-data-manager/login/user/:uid/api/:aid/hist", component: histmgr_1.HistMgr }))));
+            React.createElement(react_router_dom_1.Route, { exact: true, path: "/test-data-manager/login/users/:uid/apis", component: apimgr_1.ApiMgr }),
+            React.createElement(react_router_dom_1.Route, { exact: true, path: "/test-data-manager/login/users/:uid/apis/:aid/history", component: histmgr_1.HistMgr }))));
 }
 window.onload = function () {
     ReactDOM.render(React.createElement(MainPane, null), document.getElementById("root"));
@@ -272,24 +272,50 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var React = require("react");
-var react_router_dom_1 = require("react-router-dom");
 var Backbone = require("backbone");
 var UserModel = /** @class */ (function (_super) {
     __extends(UserModel, _super);
-    function UserModel() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.userId = "";
-        _this.userName = "";
-        _this.password = "";
-        return _this;
+    function UserModel(attrs, options) {
+        return _super.call(this, attrs || {}, options) || this;
     }
+    Object.defineProperty(UserModel.prototype, "userID", {
+        get: function () {
+            return this.get('userID');
+        },
+        set: function (v) {
+            this.set('userID', v);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(UserModel.prototype, "userName", {
+        get: function () {
+            return this.get('userName');
+        },
+        set: function (v) {
+            this.set('userName', v);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(UserModel.prototype, "password", {
+        get: function () {
+            return this.get('password');
+        },
+        set: function (v) {
+            this.set('password', v);
+        },
+        enumerable: true,
+        configurable: true
+    });
     return UserModel;
 }(Backbone.Model));
 var UserCollection = /** @class */ (function (_super) {
     __extends(UserCollection, _super);
     function UserCollection() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.url = "/users";
+        _this.url = "/api/users";
+        _this.model = UserModel;
         return _this;
     }
     return UserCollection;
@@ -298,52 +324,64 @@ var ClientModel = /** @class */ (function (_super) {
     __extends(ClientModel, _super);
     function ClientModel() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.url = function () { return "/adminclient"; };
-        _this.clientKey = "";
-        _this.clientName = "";
+        _this.url = function () { return "/api/adminclient"; };
         return _this;
     }
+    Object.defineProperty(ClientModel.prototype, "clientKey", {
+        get: function () {
+            return this.get('clientKey');
+        },
+        set: function (v) {
+            this.set('clientKey', v);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(ClientModel.prototype, "clientName", {
+        get: function () {
+            return this.get('clientName');
+        },
+        set: function (v) {
+            this.set('clientName', v);
+        },
+        enumerable: true,
+        configurable: true
+    });
     return ClientModel;
 }(Backbone.Model));
 var UserEditor = /** @class */ (function (_super) {
     __extends(UserEditor, _super);
     function UserEditor(props) {
         var _this = _super.call(this, props) || this;
-        _this.user = null;
         _this.state = {
-            userId: "",
-            userName: "",
-            password: ""
+            userID: props.user.userID,
+            userName: props.user.userName,
+            password: props.user.password
         };
         return _this;
     }
-    UserEditor.prototype.componentDidMount = function () {
-        this.locationState = this.props.location.state;
-        this.setState({
-            userId: this.locationState.user.userId,
-            userName: this.locationState.user.userName,
-            password: this.locationState.user.password
-        });
-    };
-    UserEditor.prototype.componentWillUnmount = function () {
-        this.locationState = undefined;
-    };
     UserEditor.prototype.remove = function () {
-        this.locationState.onRemove(this.locationState.user);
+        this.props.onRemove(this.props.user);
     };
     UserEditor.prototype.clearHist = function () {
-        this.locationState.onClearHist(this.locationState.user);
+        this.props.onClearHist(this.props.user);
     };
     UserEditor.prototype.update = function () {
         var _this = this;
-        if (this.locationState.user) {
-            this.locationState.user.userName = this.state.userName;
-            this.locationState.user.userId = this.state.userId;
-            this.locationState.user.password = this.state.password;
-            this.locationState.user.save({ success: function () {
-                    _this.locationState.onUpdate();
-                } });
-        }
+        this.props.user.userName = this.state.userName;
+        this.props.user.userID = this.state.userID;
+        this.props.user.password = this.state.password;
+        this.props.user.save(null, { success: function () {
+                console.log("success to update usermodel");
+                _this.props.onUpdate();
+            } });
+    };
+    UserEditor.prototype.componentWillReceiveProps = function (props, nextContext) {
+        this.setState({
+            userID: props.user.userID,
+            userName: props.user.userName,
+            password: props.user.password
+        });
     };
     UserEditor.prototype.render = function () {
         var _this = this;
@@ -351,7 +389,7 @@ var UserEditor = /** @class */ (function (_super) {
             React.createElement("h2", null, "\u30E6\u30FC\u30B6\u7DE8\u96C6"),
             React.createElement("div", null,
                 React.createElement("label", null, "\u30E6\u30FC\u30B6ID"),
-                React.createElement("input", { type: "text", value: this.state.userId, onChange: function (e) { return _this.setState({ userId: e.target.value }); } })),
+                React.createElement("input", { type: "text", value: this.state.userID, onChange: function (e) { return _this.setState({ userID: e.target.value }); } })),
             React.createElement("div", null,
                 React.createElement("label", null, "\u30E6\u30FC\u30B6\u540D"),
                 React.createElement("input", { type: "text", value: this.state.userName, onChange: function (e) { return _this.setState({ userName: e.target.value }); } })),
@@ -361,9 +399,64 @@ var UserEditor = /** @class */ (function (_super) {
             React.createElement("div", null,
                 React.createElement("button", { onClick: function () { return _this.clearHist(); } }, "\u5C65\u6B74\u30AF\u30EA\u30A2"),
                 React.createElement("button", { onClick: function () { return _this.remove(); } }, "\u524A\u9664"),
-                React.createElement("button", { onClick: function () { return _this.update(); } }, "\u4FDD\u5B58"))));
+                React.createElement("button", { onClick: function () { return _this.update(); } }, "\u4FDD\u5B58"),
+                React.createElement("button", { onClick: this.props.onCancel }, "\u30AD\u30E3\u30F3\u30BB\u30EB"))));
     };
     return UserEditor;
+}(React.Component));
+var UserMgrAction;
+(function (UserMgrAction) {
+    UserMgrAction[UserMgrAction["NONE"] = 1] = "NONE";
+    UserMgrAction[UserMgrAction["NEW"] = 2] = "NEW";
+    UserMgrAction[UserMgrAction["EDIT"] = 3] = "EDIT";
+})(UserMgrAction || (UserMgrAction = {}));
+var UserList = /** @class */ (function (_super) {
+    __extends(UserList, _super);
+    function UserList(props) {
+        var _this = _super.call(this, props) || this;
+        _this.state = {
+            checkedUserID: null
+        };
+        return _this;
+    }
+    UserList.prototype.componentWillReceiveProps = function (nextProps, nextContext) {
+        console.log("componentWillReceiveProps");
+        this.props.users !== nextProps.users && this.setState({
+            checkedUserID: null
+        });
+    };
+    UserList.prototype.selectUser = function (u) {
+        this.props.onSelect(u);
+    };
+    UserList.prototype.showApis = function (u) {
+        this.props.onShowAPI(u);
+    };
+    UserList.prototype.render = function () {
+        var self = this;
+        if (this.props.users) {
+            return (React.createElement("div", null,
+                React.createElement("table", null,
+                    React.createElement("tbody", null,
+                        React.createElement("tr", null,
+                            React.createElement("td", null, "\u9078\u629E"),
+                            React.createElement("td", null, "\u30E6\u30FC\u30B6ID"),
+                            React.createElement("td", null, "\u30E6\u30FC\u30B6\u540D"),
+                            React.createElement("td", null, "API")),
+                        this.props.users.models.map(function (u) {
+                            return (React.createElement("tr", { key: u.userID },
+                                React.createElement("td", null,
+                                    React.createElement("input", { type: "radio", name: "selectUser", value: u.userID, onClick: function () { return self.selectUser(u); }, checked: u.userID == self.state.checkedUserID, onChange: function (e) { return self.setState({ checkedUserID: e.target.value }); } })),
+                                React.createElement("td", null, u.userID),
+                                React.createElement("td", null, u.userName),
+                                React.createElement("td", null,
+                                    React.createElement("a", { onClick: function () { return self.showApis(u); } }, "\uFF1E\uFF1E"))));
+                        })))));
+        }
+        else {
+            return React.createElement("div", null);
+        }
+    };
+    return UserList;
 }(React.Component));
 var UserMgr = /** @class */ (function (_super) {
     __extends(UserMgr, _super);
@@ -372,130 +465,74 @@ var UserMgr = /** @class */ (function (_super) {
         _this.state = {
             currentUser: null,
             users: null,
-            client: null
+            client: null,
+            action: UserMgrAction.NONE
         };
         return _this;
     }
     UserMgr.prototype.componentDidMount = function () {
         var _this = this;
-        console.log("componentDidMount");
-        var users = new UserCollection();
-        users.fetch({
-            success: function () {
-                _this.setState({
-                    users: users
-                });
-            }
-        });
+        this.refreshUserList();
         var client = new ClientModel();
         client.fetch({
             success: function () {
-                _this.setState({
-                    client: client
-                });
+                _this.setState({ client: client.clientName + "(" + client.clientKey + ")" });
             }
         });
     };
     UserMgr.prototype.logout = function () {
     };
-    UserMgr.prototype.newUser = function () {
+    UserMgr.prototype.refreshUserList = function () {
         var _this = this;
-        var state = {
-            onCancel: function () { return _this.props.history.goBack(); },
-            onSave: function (id, name, password) {
-                _this.state.users.create({
-                    userId: id,
-                    userName: name,
-                    password: password
-                }, {
-                    success: function () {
-                        var users = new UserCollection();
-                        users.fetch({
-                            success: function () {
-                                _this.setState({ users: users });
-                            }
-                        });
-                    }
-                });
-                _this.props.history.goBack();
+        var users = new UserCollection();
+        users.fetch({
+            success: function () {
+                _this.setState({ users: users, action: UserMgrAction.NONE });
             }
-        };
-        this.props.history.push("" + this.props.match, {
-            addUser: function (identify, name, password) {
-                _this.state.users.create({
-                    userId: identify,
-                    userName: name,
-                    password: password
-                }, { success: function () {
-                        var users = new UserCollection();
-                        users.fetch({
-                            success: function () {
-                                _this.setState({ users: users });
-                            }
-                        });
-                    } });
+        });
+    };
+    UserMgr.prototype.newUser = function () {
+        this.setState({ action: UserMgrAction.NEW });
+    };
+    UserMgr.prototype.createUser = function (id, name, pwd) {
+        var _this = this;
+        var u = new UserModel({
+            userID: id,
+            userName: name,
+            password: pwd
+        });
+        this.state.users.create(u, {
+            success: function () {
+                _this.refreshUserList();
             }
+        });
+    };
+    UserMgr.prototype.removeUser = function (user) {
+        var _this = this;
+        var u = this.state.users.get(user.id);
+        u.destroy({
+            success: function () { return _this.refreshUserList(); }
         });
     };
     UserMgr.prototype.clearUserHistory = function (user) {
     };
     UserMgr.prototype.selectUser = function (u) {
-        var _this = this;
-        var state = {
-            user: u,
-            onCancel: function () { return _this.props.history.goBack(); },
-            onClearHist: function (u) { return _this.clearUserHistory(u); },
-            onRemove: function (u) {
-                u.destroy({
-                    success: function () {
-                        var users = new UserCollection();
-                        users.fetch({
-                            success: function () {
-                                _this.setState({ users: users });
-                            }
-                        });
-                    }
-                });
-            },
-            onUpdate: function () {
-                var users = new UserCollection();
-                users.fetch({
-                    success: function () {
-                        _this.setState({ users: users });
-                    }
-                });
-            }
-        };
+        this.setState({
+            currentUser: u,
+            action: UserMgrAction.EDIT
+        });
     };
     UserMgr.prototype.clearAllHistory = function () {
     };
     UserMgr.prototype.showApi = function (u) {
-        this.props.history.push(this.props.match.url + "/" + u.userId + "/api");
+        this.props.history.push(this.props.match.url + "/users/" + u.id + "/apis");
     };
     UserMgr.prototype.render = function () {
         var _this = this;
-        var UserList = function (props) { return (React.createElement("div", null,
-            React.createElement("div", null,
-                React.createElement("table", null,
-                    React.createElement("tbody", null,
-                        React.createElement("tr", null,
-                            React.createElement("td", null, "\u9078\u629E"),
-                            React.createElement("td", null, "\u30E6\u30FC\u30B6ID"),
-                            React.createElement("td", null, "\u30E6\u30FC\u30B6\u540D"),
-                            React.createElement("td", null, "API")),
-                        props.users.models.map(function (u) {
-                            return (React.createElement("tr", { key: u.userId },
-                                React.createElement("td", null,
-                                    React.createElement("input", { type: "radio", name: "selectUser", value: u.userId, onClick: function () { return props.onSelect(u); } })),
-                                React.createElement("td", null, u.userId),
-                                React.createElement("td", null, u.userName),
-                                React.createElement("a", { onClick: function () { return props.onShowAPI(u); } }, "\uFF1E\uFF1E")));
-                        })))))); };
         var UserNew = function (props) {
             var identify = "";
             var name = "";
             var password = "";
-            var state = props.location.state;
             return (React.createElement("div", null,
                 React.createElement("h2", null, "\u30E6\u30FC\u30B6\u7DE8\u96C6"),
                 React.createElement("div", null,
@@ -508,27 +545,31 @@ var UserMgr = /** @class */ (function (_super) {
                     React.createElement("label", null, "\u30D1\u30B9\u30EF\u30FC\u30C9"),
                     React.createElement("input", { type: "password", onChange: function (e) { return password = e.target.value; } })),
                 React.createElement("div", null,
-                    React.createElement("button", { onClick: function () { return state.onCancel(); } }, "\u30AD\u30E3\u30F3\u30BB\u30EB"),
-                    React.createElement("button", { onClick: function () { return state.onSave(identify, name, password); } }, "\u4FDD\u5B58"))));
+                    React.createElement("button", { onClick: function () { return props.onCancel(); } }, "\u30AD\u30E3\u30F3\u30BB\u30EB"),
+                    React.createElement("button", { onClick: function () { return props.onSave(identify, name, password); } }, "\u4FDD\u5B58"))));
         };
         if (this.state.client && this.state.users) {
-            return (React.createElement(react_router_dom_1.BrowserRouter, null,
-                React.createElement("div", null,
-                    React.createElement("h1", null, "\u30E6\u30FC\u30B6\u30E1\u30A4\u30F3\u30C6\u30CA\u30F3\u30B9"),
-                    React.createElement("span", null,
-                        React.createElement("div", null,
-                            React.createElement("label", null, "\u30AF\u30E9\u30A4\u30A2\u30F3\u30C8"),
-                            React.createElement("input", { type: "text", readOnly: true, value: this.state.client.clientName + "(" + this.state.client.clientKey + ")" }),
-                            React.createElement("button", { type: "button", onClick: function () { return _this.logout(); } }, "\u30ED\u30B0\u30A2\u30A6\u30C8")),
-                        React.createElement("div", null,
-                            React.createElement("button", { type: "button", onClick: function () { return _this.newUser(); } }, "\u8FFD\u52A0"),
-                            React.createElement(UserList, { users: this.state.users, onSelect: function (u) { return _this.selectUser(u); }, onShowAPI: function (u) { return _this.showApi(u); } }))),
-                    React.createElement("span", null,
-                        React.createElement("div", null,
-                            React.createElement("button", { type: "button", onClick: function () { return _this.clearAllHistory(); } }, "\u5168\u5C65\u6B74\u30AF\u30EA\u30A2")),
-                        React.createElement(react_router_dom_1.Route, { exact: true, path: "" + this.props.match.url, render: function () { return React.createElement("div", null); } }),
-                        React.createElement(react_router_dom_1.Route, { path: this.props.match.url + "/editor", component: UserEditor }),
-                        React.createElement(react_router_dom_1.Route, { path: this.props.match.url + "/new", component: UserNew })))));
+            return (React.createElement("div", null,
+                React.createElement("h1", null, "\u30E6\u30FC\u30B6\u30E1\u30A4\u30F3\u30C6\u30CA\u30F3\u30B9"),
+                React.createElement("span", null,
+                    React.createElement("div", null,
+                        React.createElement("label", null, "\u30AF\u30E9\u30A4\u30A2\u30F3\u30C8"),
+                        React.createElement("input", { type: "text", readOnly: true, value: this.state.client }),
+                        React.createElement("button", { type: "button", onClick: function () { return _this.logout(); } }, "\u30ED\u30B0\u30A2\u30A6\u30C8")),
+                    React.createElement("div", null,
+                        React.createElement("button", { type: "button", onClick: function () { return _this.newUser(); } }, "\u8FFD\u52A0"),
+                        React.createElement("button", { type: "button", onClick: function () { return _this.refreshUserList(); } }, "\u518D\u53D6\u5F97"),
+                        React.createElement(UserList, { users: this.state.users, onSelect: function (u) { return _this.selectUser(u); }, onShowAPI: function (u) { return _this.showApi(u); } }))),
+                React.createElement("span", null,
+                    React.createElement("div", null,
+                        React.createElement("button", { type: "button", onClick: function () { return _this.clearAllHistory(); } }, "\u5168\u5C65\u6B74\u30AF\u30EA\u30A2"),
+                        this.state.action == UserMgrAction.NONE ?
+                            React.createElement("div", null)
+                            :
+                                this.state.action == UserMgrAction.NEW ?
+                                    React.createElement(UserNew, { onCancel: function () { return _this.setState({ action: UserMgrAction.NONE }); }, onSave: function (id, name, pwd) { _this.createUser(id, name, pwd); } })
+                                    :
+                                        React.createElement(UserEditor, { user: this.state.currentUser, onCancel: function () { return _this.setState({ action: UserMgrAction.NONE }); }, onClearHist: function (u) { return _this.clearUserHistory(u); }, onUpdate: function () { return _this.refreshUserList(); }, onRemove: function (u) { return _this.removeUser(u); } })))));
         }
         else {
             return React.createElement("div", null, "User data loading ..................................");
@@ -538,7 +579,7 @@ var UserMgr = /** @class */ (function (_super) {
 }(React.Component));
 exports.UserMgr = UserMgr;
 
-},{"backbone":6,"react":70,"react-router-dom":56}],6:[function(require,module,exports){
+},{"backbone":6,"react":70}],6:[function(require,module,exports){
 (function (global){
 //     Backbone.js 1.3.3
 

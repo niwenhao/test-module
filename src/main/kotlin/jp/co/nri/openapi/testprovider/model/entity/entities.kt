@@ -7,17 +7,17 @@ import javax.persistence.*
 data class ProviderUser(
         @Id
         @GeneratedValue
-        var id: Long?,
+        var id: Long? = null,
         @Column(length=64)
-        var clientKey: String,
+        var clientKey: String? = null,
         @Column(length=20)
-        var userID: String,
+        var userID: String? = null,
         @Column(length=64)
-        var userName: String,
+        var userName: String? = null,
         @Column(length=64)
-        var password: String,
+        var password: String? = null,
         @OneToMany(targetEntity = ProviderApi::class)
-        var providerApis: List<ProviderApi>
+        var providerApis: List<ProviderApi>? = null
 )
 
 @Entity

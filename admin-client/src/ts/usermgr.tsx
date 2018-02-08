@@ -4,82 +4,111 @@ import { RouteComponentProps } from 'react-router'
 
 import * as Backbone from 'backbone'
 
+interface User {
+  userID: string
+  userName: string
+  password: string
+}
+class UserModel extends Backbone.Model implements User {
+  constructor(attrs?: User, options?: any) {
+    super(attrs || {}, options)
+  }
+  get userID() : string {
+    return this.get('userID')
+  }
 
-class UserModel extends Backbone.Model {
-  userId: string = ""
-  userName: string = ""
-  password: string = ""
+  set userID(v: string) {
+    this.set('userID', v)
+  }
+
+  get userName(): string {
+    return this.get('userName')
+  }
+
+  set userName(v: string) {
+    this.set('userName', v)
+  }
+
+  get password(): string {
+    return this.get('password')
+  }
+  set password(v: string) {
+    this.set('password', v)
+  }
 }
 
 class UserCollection extends Backbone.Collection<UserModel> {
-  url = "/users"
+  url = "/api/users"
+
+  model = UserModel
 }
 
 class ClientModel extends Backbone.Model {
-  url = () => "/adminclient"
-  clientKey: string = ""
-  clientName: string = ""
+  url = () => "/api/adminclient"
+
+  get clientKey(): string {
+    return this.get('clientKey')
+  }
+  set clientKey(v: string) {
+    this.set('clientKey', v)
+  }
+  get clientName(): string {
+    return this.get('clientName')
+  }
+  set clientName(v: string) {
+    this.set('clientName', v)
+  }
 }
 
 interface UserEditorState {
-  userId: string
+  userID: string
   userName: string
   password: string
 }
 
-interface UserEditorLocationState {
+interface UserEditorProps {
   user: UserModel
   onCancel: () => void
   onClearHist: (u:UserModel) => void
-  onRemove: (u: UserModel) => void
   onUpdate: () => void
+  onRemove: (u: UserModel) => void
 }
 
-class UserEditor extends React.Component<RouteComponentProps<void>, UserEditorState> {
-  constructor(props: RouteComponentProps<void>) {
+class UserEditor extends React.Component<UserEditorProps, UserEditorState> {
+  constructor(props: UserEditorProps) {
     super(props)
     this.state = {
-      userId: "",
-      userName: "",
-      password: ""
+      userID: props.user.userID,
+      userName: props.user.userName,
+      password: props.user.password
     }
-  }
-
-  user : UserModel | null = null
-
-  locationState?: UserEditorLocationState
-
-  componentDidMount() {
-    this.locationState = this.props.location.state
-    this.setState({
-      userId: this.locationState!.user.userId,
-      userName: this.locationState!.user.userName,
-      password: this.locationState!.user.password
-    })
-  }
-
-  componentWillUnmount() {
-    this.locationState = undefined
   }
 
   remove() {
-    this.locationState!.onRemove(this.locationState!.user)
+    this.props.onRemove(this.props.user)
   }
 
   clearHist() {
-    this.locationState!.onClearHist(this.locationState!.user)
+    this.props.onClearHist(this.props.user)
   }
 
   update() {
-    if (this.locationState!.user) {
-      this.locationState!.user.userName = this.state.userName
-      this.locationState!.user.userId = this.state.userId
-      this.locationState!.user.password = this.state.password
+    this.props.user.userName = this.state.userName
+    this.props.user.userID = this.state.userID
+    this.props.user.password = this.state.password
 
-      this.locationState!.user.save({ success: () => {
-        this.locationState!.onUpdate()
-      }})
-    }
+    this.props.user.save(null, { success: () => {
+      console.log(`success to update usermodel`)
+      this.props.onUpdate()
+    }})
+  }
+
+  componentWillReceiveProps(props: UserEditorProps, nextContext: any) {
+    this.setState({
+      userID: props.user.userID,
+      userName: props.user.userName,
+      password: props.user.password
+    })
   }
 
   render(): React.ReactNode {
@@ -88,7 +117,7 @@ class UserEditor extends React.Component<RouteComponentProps<void>, UserEditorSt
         <h2>ユーザ編集</h2>
         <div>
           <label>ユーザID</label>
-          <input type="text" value={this.state.userId} onChange = {(e:any) => this.setState({userId: e.target.value})} />
+          <input type="text" value={this.state.userID} onChange = {(e:any) => this.setState({userID: e.target.value})} />
         </div>
         <div>
           <label>ユーザ名</label>
@@ -102,21 +131,99 @@ class UserEditor extends React.Component<RouteComponentProps<void>, UserEditorSt
           <button onClick={() => this.clearHist()}>履歴クリア</button>
           <button onClick={() => this.remove()}>削除</button>
           <button onClick={() => this.update()}>保存</button>
+          <button onClick={this.props.onCancel}>キャンセル</button>
         </div>
       </div>
     )
   }
 }
 
+enum UserMgrAction { NONE = 1, NEW, EDIT }
 interface UserMgrState {
   currentUser: UserModel | null
   users: UserCollection | null
-  client: ClientModel | null
+  client: string | null
+  action: UserMgrAction
 }
 
-interface UserNewLocationState {
+interface UserNewProps {
   onCancel: ()=> void
   onSave: (id:string, name:string, password:string)=> void
+}
+
+interface UserListState {
+  checkedUserID: string | null
+}
+
+interface UserListProps {
+    users: UserCollection | null
+    onSelect: (user: UserModel) => void
+    onShowAPI: (user: UserModel) => void
+}
+
+class UserList extends React.Component<UserListProps, UserListState>
+{
+  constructor(props: UserListProps) {
+    super(props)
+    this.state = {
+      checkedUserID: null
+    }
+  }
+
+  componentWillReceiveProps(nextProps: UserListProps, nextContext: any) {
+    console.log("componentWillReceiveProps")
+    this.props.users !== nextProps.users && this.setState({
+      checkedUserID: null
+    })
+  }
+
+  selectUser(u: UserModel) {
+    this.props.onSelect(u)
+  }
+
+  showApis(u: UserModel) {
+    this.props.onShowAPI(u)
+  }
+
+  render(): React.ReactNode {
+    let self = this
+    if (this.props.users) {
+      return (
+        <div>
+          <table>
+            <tbody>
+              <tr>
+                <td>選択</td>
+                <td>ユーザID</td>
+                <td>ユーザ名</td>
+                <td>API</td>
+              </tr>
+              { this.props.users!.models.map(
+                  function(u:UserModel): React.ReactNode {
+                    return (
+                      <tr key={u.userID}>
+                        <td>
+                          <input type="radio" name="selectUser" value={u.userID}
+                                 onClick={ () => self.selectUser(u) } 
+                                 checked={u.userID == self.state.checkedUserID}
+                                 onChange={(e) => self.setState({ checkedUserID: e.target.value }) }/>
+                        </td>
+                        <td>{u.userID}</td>
+                        <td>{u.userName}</td>
+                        <td><a onClick={ () => self.showApis(u) }>＞＞</a></td>
+                      </tr>
+                    )
+                  }
+                )}
+            </tbody>
+          </table>
+        </div>
+      )
+    } else {
+      return <div/>
+    }
+  }
+
 }
 
 export class UserMgr 
@@ -127,26 +234,17 @@ export class UserMgr
     this.state = {
       currentUser: null,
       users: null,
-      client: null
+      client: null,
+      action: UserMgrAction.NONE
     }
   }
 
   componentDidMount():void {
-    console.log("componentDidMount")
-    let users = new UserCollection()
-    users.fetch({
-      success: () => {
-        this.setState({
-          users: users
-        })
-      }
-    })
+    this.refreshUserList()
     let client = new ClientModel()
     client.fetch({
       success: () => {
-        this.setState( {
-          client: client
-        })
+        this.setState({ client: `${client.clientName}(${client.clientKey})`})
       }
     })
   }
@@ -155,42 +253,37 @@ export class UserMgr
 
   }
 
+  refreshUserList() {
+    let users = new UserCollection()
+    users.fetch({
+      success: () => {
+        this.setState({users: users, action: UserMgrAction.NONE})
+      }
+    })
+  }
+
   newUser() {
-    let state: UserNewLocationState = {
-      onCancel: () => this.props.history.goBack(),
-      onSave: (id, name, password) => {
-        this.state.users!.create({
-          userId: id,
-          userName: name,
-          password: password
-        }, {
-          success: () => {
-            let users = new UserCollection()
-            users.fetch({
-              success: () => {
-                this.setState({users: users})
-              }
-            })
-          }
-        })
-        this.props.history.goBack()
+    this.setState({action: UserMgrAction.NEW})
+  }
+
+  createUser(id: string, name: string, pwd: string) {
+    let u = new UserModel({
+      userID: id,
+      userName: name,
+      password: pwd
+    })
+
+    this.state.users!.create(u, {
+      success: () => {
+        this.refreshUserList()
       }
-    }
-    this.props.history.push(`${this.props.match}`, {
-      addUser: (identify: string, name: string, password: string) => {
-        this.state.users!.create({
-          userId: identify,
-          userName: name,
-          password: password
-        }, { success: () => {
-          let users = new UserCollection()
-          users.fetch({
-            success: () => {
-              this.setState({users: users})
-            }
-          })
-        }})
-      }
+    })
+  }
+
+  removeUser(user:UserModel) {
+    let u = this.state.users!.get(user.id)
+    u.destroy({
+      success: () => this.refreshUserList()
     })
   }
 
@@ -199,79 +292,25 @@ export class UserMgr
   }
 
   selectUser(u:UserModel) {
-    let state:UserEditorLocationState = {
-      user: u,
-      onCancel: () => this.props.history.goBack(),
-      onClearHist: (u) => this.clearUserHistory(u),
-      onRemove: (u) => {
-        u.destroy({
-          success: () => {
-            let users = new UserCollection()
-            users.fetch({
-              success: () => {
-                this.setState({users: users})
-              }
-            })
-          }
-        },
-      )},
-      onUpdate: () => {
-        let users = new UserCollection()
-        users.fetch({
-          success: () => {
-            this.setState({users: users})
-          }
-        })
-      }
-    }
+    this.setState({
+      currentUser: u,
+      action: UserMgrAction.EDIT
+    })
   }
 
   clearAllHistory() {
   }
 
   showApi(u: UserModel) {
-    this.props.history.push(`${this.props.match.url}/${u.userId}/api`)
+    this.props.history.push(`${this.props.match.url}/users/${u.id}/apis`)
   }
 
   render(): React.ReactNode {
-    const UserList: React.SFC<{
-      users: UserCollection | null,
-      onSelect: (user: UserModel) => void, 
-      onShowAPI: (user: UserModel) => void
-    }> = (props) => (
-      <div>
-        <div>
-          <table>
-            <tbody>
-              <tr>
-                <td>選択</td>
-                <td>ユーザID</td>
-                <td>ユーザ名</td>
-                <td>API</td>
-              </tr>
-              { props.users!.models.map(
-                  function(u:UserModel): React.ReactNode {
-                    return (
-                      <tr key={u.userId}>
-                        <td><input type="radio" name="selectUser" value={u.userId} onClick={ () => props.onSelect(u) }/></td>
-                        <td>{u.userId}</td>
-                        <td>{u.userName}</td>
-                        <a onClick={ () => props.onShowAPI(u) }>＞＞</a>
-                      </tr>
-                    )
-                  }
-                )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    )
 
-    const UserNew: React.SFC<RouteComponentProps<void>> = function(props) {
+    const UserNew: React.SFC<UserNewProps> = function(props) {
       var identify = ""
       var name = ""
       var password = ""
-      let state = props.location.state as UserNewLocationState
       return (
         <div>
           <h2>ユーザ編集</h2>
@@ -288,8 +327,8 @@ export class UserMgr
             <input type="password" onChange = {(e:any) => password=e.target.value} />
           </div>
           <div>
-            <button onClick={() => state.onCancel()}>キャンセル</button>
-            <button onClick={() => state.onSave(identify, name, password)}>保存</button>
+            <button onClick={() => props.onCancel()}>キャンセル</button>
+            <button onClick={() => props.onSave(identify, name, password)}>保存</button>
           </div>
         </div>
       )
@@ -297,30 +336,43 @@ export class UserMgr
 
     if (this.state.client && this.state.users) {
       return (
-        <Router>
         <div>
           <h1>ユーザメインテナンス</h1>
           <span>
             <div>
             <label>クライアント</label>
-            <input type="text" readOnly={true} value={this.state.client!.clientName + "(" + this.state.client!.clientKey + ")"}/>
+            <input type="text" readOnly={true} value={this.state.client}/>
             <button type="button" onClick={ () => this.logout() }>ログアウト</button>
             </div>
             <div>
               <button type="button" onClick={ () => this.newUser() }>追加</button>
+              <button type="button" onClick={ () => this.refreshUserList() }>再取得</button>
               <UserList users={ this.state.users } onSelect={ u => this.selectUser(u) } onShowAPI={ u => this.showApi(u) }/>
             </div>
           </span>
           <span>
             <div>
               <button type="button" onClick={ () => this.clearAllHistory() }>全履歴クリア</button>
+              {
+                this.state.action == UserMgrAction.NONE ? 
+                  <div/> 
+                  : 
+                  this.state.action == UserMgrAction.NEW ? 
+                    <UserNew onCancel={() => this.setState({ action: UserMgrAction.NONE })}
+                             onSave={(id, name, pwd) => { this.createUser(id, name, pwd)}}
+                             />
+                    :
+                    <UserEditor user={this.state.currentUser!}
+                                onCancel={() => this.setState({ action: UserMgrAction.NONE })}
+                                onClearHist={(u) => this.clearUserHistory(u)}
+                                onUpdate={() => this.refreshUserList()}
+                                onRemove={(u) => this.removeUser(u)}
+                                />
+
+              }
             </div>
-            <Route exact path={`${this.props.match.url}`} render={()=><div/>}/>
-            <Route path={`${this.props.match.url}/editor`} component={UserEditor}/>
-            <Route path={`${this.props.match.url}/new`} component={UserNew}/>
           </span>
         </div>
-        </Router>
       )
     } else {
       return <div>User data loading ..................................</div>
