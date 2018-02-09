@@ -281,7 +281,7 @@ export class UserMgr
     if (this.state.client && this.state.users) {
       return (
         <div>
-          <h1>ユーザメインテナンス</h1>
+          <h1>ユーザメンテナンス</h1>
           <div>
             <label>クライアント</label>
             <input type="text" readOnly={true} value={this.state.client}/>
@@ -289,6 +289,7 @@ export class UserMgr
             <button type="button" onClick={ () => this.clearAllHistory() }>全履歴クリア</button>
           </div>
           <table>
+            <tbody>
             <tr>
               <td>
                 <div>
@@ -319,6 +320,7 @@ export class UserMgr
                 </div>
               </td>
             </tr>
+            </tbody>
           </table>
         </div>
       )

@@ -260,6 +260,14 @@ var ApiEditPane = /** @class */ (function (_super) {
         };
         return _this;
     }
+    ApiEditPane.prototype.componentWillReceiveProps = function (props, context) {
+        this.setState({
+            apiPath: props.api.apiPath,
+            apiName: props.api.apiName,
+            condition: props.api.conditionJson,
+            response: props.api.responseJson
+        });
+    };
     ApiEditPane.prototype.clearHistory = function () {
         this.props.onClearHistory(this.props.api);
     };
@@ -295,15 +303,15 @@ var ApiEditPane = /** @class */ (function (_super) {
                     React.createElement("td", null,
                         React.createElement("label", null, "\u6761\u4EF6")),
                     React.createElement("td", null,
-                        React.createElement("textarea", { onChange: function (e) { return _this.setState({ condition: e.target.value }); } }, this.state.condition))),
+                        React.createElement("textarea", { onChange: function (e) { return _this.setState({ condition: e.target.value }); }, value: this.state.condition }))),
                 React.createElement("tr", null,
                     React.createElement("td", null,
                         React.createElement("label", null, "\u30EC\u30B9\u30DD\u30F3\u30B9")),
                     React.createElement("td", null,
-                        React.createElement("textarea", { onChange: function (e) { return _this.setState({ response: e.target.value }); } }, this.state.response)))),
+                        React.createElement("textarea", { onChange: function (e) { return _this.setState({ response: e.target.value }); }, value: this.state.response })))),
             React.createElement("div", null,
-                React.createElement("button", { onClick: function () { return _this.clearHistory(); } }, "\u4FDD\u5B58"),
-                React.createElement("button", { onClick: function () { return _this.delete(); } }, "\u4FDD\u5B58"),
+                React.createElement("button", { onClick: function () { return _this.clearHistory(); } }, "\u5C65\u6B74\u524A\u9664"),
+                React.createElement("button", { onClick: function () { return _this.delete(); } }, "\u524A\u9664"),
                 React.createElement("button", { onClick: function () { return _this.save(); } }, "\u4FDD\u5B58"),
                 React.createElement("button", { onClick: function () { return _this.cancel(); } }, "\u30AD\u30E3\u30F3\u30BB\u30EB"))));
     };
@@ -342,6 +350,7 @@ var ApiMgr = /** @class */ (function (_super) {
         this.refreshApiList();
     };
     ApiMgr.prototype.back = function () {
+        this.props.history.goBack();
     };
     ApiMgr.prototype.refreshApiList = function () {
         var _this = this;
@@ -353,17 +362,42 @@ var ApiMgr = /** @class */ (function (_super) {
             }); }
         });
     };
-    ApiMgr.prototype.appendUser = function () {
+    ApiMgr.prototype.appendApi = function () {
+        this.setState({ action: ApiMgrAction.NEW });
     };
     ApiMgr.prototype.selectApi = function (api) {
+        this.setState({
+            currentApi: api,
+            action: ApiMgrAction.EDIT
+        });
     };
     ApiMgr.prototype.showHistory = function (api) {
+        this.props.history.push(this.props.match.url + "/" + api.id + "/history");
     };
     ApiMgr.prototype.createUser = function (path, name, con, res) {
+        var _this = this;
+        var props = {
+            apiPath: path,
+            apiName: name,
+            conditionJson: con,
+            responseJson: res
+        };
+        this.state.apis.create(props, {
+            success: function () { return _this.refreshApiList(); }
+        });
     };
     ApiMgr.prototype.deleteApi = function (api) {
+        var _this = this;
+        var a = this.state.apis.get(api.id);
+        a.destroy({
+            success: function () { return _this.refreshApiList(); }
+        });
     };
     ApiMgr.prototype.updateApi = function (api) {
+        var _this = this;
+        api.save(null, {
+            success: function () { return _this.refreshApiList(); }
+        });
     };
     ApiMgr.prototype.clearHistory = function (api) {
     };
@@ -375,13 +409,16 @@ var ApiMgr = /** @class */ (function (_super) {
     };
     ApiMgr.prototype.render = function () {
         var _this = this;
-        var ShowApi = function (api) { return (React.createElement("tr", { key: api.id },
-            React.createElement("td", null,
-                React.createElement("input", { type: 'radio', checked: (_this.state.currentApi && _this.state.currentApi.id) == api.id, onClick: function () { return _this.selectApi(api); }, value: api.id })),
-            React.createElement("td", null, api.apiPath),
-            React.createElement("td", null, api.apiName),
-            React.createElement("td", null,
-                React.createElement("a", { onClick: function () { return _this.showHistory(api); } }, "\uFF1E\uFF1E")))); };
+        var ShowApi = function (api) {
+            console.log("api = " + JSON.stringify(api));
+            return (React.createElement("tr", { key: api.id },
+                React.createElement("td", null,
+                    React.createElement("input", { type: 'radio', checked: (_this.state.currentApi && _this.state.currentApi.id) == api.id, onClick: function () { return _this.selectApi(api); }, value: api.id })),
+                React.createElement("td", null, api.apiPath),
+                React.createElement("td", null, api.apiName),
+                React.createElement("td", null,
+                    React.createElement("a", { onClick: function () { return _this.showHistory(api); } }, "\uFF1E\uFF1E"))));
+        };
         var SwitchApiPane = function (self) {
             switch (self.state.action) {
                 case ApiMgrAction.NONE: return React.createElement("div", null);
@@ -389,7 +426,7 @@ var ApiMgr = /** @class */ (function (_super) {
                 case ApiMgrAction.EDIT: return React.createElement(ApiEditPane, { api: self.state.currentApi, onCancel: function () { return self.cancel(); }, onSave: function (api) { return self.updateApi(api); }, onClearHistory: function (api) { return self.clearHistory(api); }, onDelete: function (api) { return self.deleteApi(api); } });
             }
         };
-        if (this.state.client && this.state.apis) {
+        if (this.state.client && this.state.apis && this.state.user) {
             return (React.createElement("div", null,
                 React.createElement("a", { onClick: function () { return _this.back(); } }, "\uFF1C\uFF1C"),
                 React.createElement("h1", null, "API\u30E1\u30F3\u30C6\u30CA\u30F3\u30B9"),
@@ -400,22 +437,24 @@ var ApiMgr = /** @class */ (function (_super) {
                     React.createElement("label", null, "\u30E6\u30FC\u30B6"),
                     React.createElement("input", { type: 'text', readOnly: true, value: this.state.user.userName + "(" + this.state.user.userID + ")" })),
                 React.createElement("table", null,
-                    React.createElement("tr", null,
-                        React.createElement("td", null,
-                            React.createElement("div", null,
-                                React.createElement("button", { onClick: function () { return _this.refreshApiList(); } }, "\u66F4\u65B0"),
-                                React.createElement("button", { onClick: function () { return _this.appendUser(); } }, "\u8FFD\u52A0")),
-                            React.createElement("table", null,
-                                React.createElement("tr", null,
-                                    React.createElement("td", null, "\u9078\u629E"),
-                                    React.createElement("td", null, "PATH"),
-                                    React.createElement("td", null, "\u8A73\u7D30"),
-                                    React.createElement("td", null, "\u5C65\u6B74")),
-                                this.state.apis.models.map(ShowApi))),
-                        React.createElement("td", null, SwitchApiPane(this))))));
+                    React.createElement("tbody", null,
+                        React.createElement("tr", null,
+                            React.createElement("td", null,
+                                React.createElement("div", null,
+                                    React.createElement("button", { onClick: function () { return _this.refreshApiList(); } }, "\u66F4\u65B0"),
+                                    React.createElement("button", { onClick: function () { return _this.appendApi(); } }, "\u8FFD\u52A0")),
+                                React.createElement("table", null,
+                                    React.createElement("tbody", null,
+                                        React.createElement("tr", null,
+                                            React.createElement("td", null, "\u9078\u629E"),
+                                            React.createElement("td", null, "PATH"),
+                                            React.createElement("td", null, "\u8A73\u7D30"),
+                                            React.createElement("td", null, "\u5C65\u6B74")),
+                                        this.state.apis.models.map(function (api) { return ShowApi(api); })))),
+                            React.createElement("td", null, SwitchApiPane(this)))))));
         }
         else {
-            React.createElement("h1", null, "Loading.....................................");
+            return React.createElement("h1", null, "Loading.....................................");
         }
     };
     return ApiMgr;
@@ -518,7 +557,7 @@ exports.ClientModel = ClientModel;
 var ApiModel = /** @class */ (function (_super) {
     __extends(ApiModel, _super);
     function ApiModel(attr, options) {
-        return _super.call(this, attr, options) || this;
+        return _super.call(this, attr || {}, options) || this;
     }
     Object.defineProperty(ApiModel.prototype, "apiPath", {
         get: function () {
@@ -569,7 +608,7 @@ var ApiCollection = /** @class */ (function (_super) {
         var _this = _super.call(this) || this;
         _this.idOfUser = idOfUser;
         _this.url = function () { return "/api/users/" + _this.idOfUser + "/apis"; };
-        _this.module = ApiModel;
+        _this.model = ApiModel;
         return _this;
     }
     return ApiCollection;
@@ -839,27 +878,28 @@ var UserMgr = /** @class */ (function (_super) {
         };
         if (this.state.client && this.state.users) {
             return (React.createElement("div", null,
-                React.createElement("h1", null, "\u30E6\u30FC\u30B6\u30E1\u30A4\u30F3\u30C6\u30CA\u30F3\u30B9"),
+                React.createElement("h1", null, "\u30E6\u30FC\u30B6\u30E1\u30F3\u30C6\u30CA\u30F3\u30B9"),
                 React.createElement("div", null,
                     React.createElement("label", null, "\u30AF\u30E9\u30A4\u30A2\u30F3\u30C8"),
                     React.createElement("input", { type: "text", readOnly: true, value: this.state.client }),
                     React.createElement("button", { type: "button", onClick: function () { return _this.logout(); } }, "\u30ED\u30B0\u30A2\u30A6\u30C8"),
                     React.createElement("button", { type: "button", onClick: function () { return _this.clearAllHistory(); } }, "\u5168\u5C65\u6B74\u30AF\u30EA\u30A2")),
                 React.createElement("table", null,
-                    React.createElement("tr", null,
-                        React.createElement("td", null,
-                            React.createElement("div", null,
-                                React.createElement("button", { type: "button", onClick: function () { return _this.newUser(); } }, "\u8FFD\u52A0"),
-                                React.createElement("button", { type: "button", onClick: function () { return _this.refreshUserList(); } }, "\u518D\u53D6\u5F97"),
-                                React.createElement(UserList, { users: this.state.users, onSelect: function (u) { return _this.selectUser(u); }, onShowAPI: function (u) { return _this.showApi(u); } }))),
-                        React.createElement("td", null,
-                            React.createElement("div", null, this.state.action == UserMgrAction.NONE ?
-                                React.createElement("div", null)
-                                :
-                                    this.state.action == UserMgrAction.NEW ?
-                                        React.createElement(UserNew, { onCancel: function () { return _this.setState({ action: UserMgrAction.NONE }); }, onSave: function (id, name, pwd) { _this.createUser(id, name, pwd); } })
-                                        :
-                                            React.createElement(UserEditor, { user: this.state.currentUser, onCancel: function () { return _this.setState({ action: UserMgrAction.NONE }); }, onClearHist: function (u) { return _this.clearUserHistory(u); }, onUpdate: function () { return _this.refreshUserList(); }, onRemove: function (u) { return _this.removeUser(u); } })))))));
+                    React.createElement("tbody", null,
+                        React.createElement("tr", null,
+                            React.createElement("td", null,
+                                React.createElement("div", null,
+                                    React.createElement("button", { type: "button", onClick: function () { return _this.newUser(); } }, "\u8FFD\u52A0"),
+                                    React.createElement("button", { type: "button", onClick: function () { return _this.refreshUserList(); } }, "\u518D\u53D6\u5F97"),
+                                    React.createElement(UserList, { users: this.state.users, onSelect: function (u) { return _this.selectUser(u); }, onShowAPI: function (u) { return _this.showApi(u); } }))),
+                            React.createElement("td", null,
+                                React.createElement("div", null, this.state.action == UserMgrAction.NONE ?
+                                    React.createElement("div", null)
+                                    :
+                                        this.state.action == UserMgrAction.NEW ?
+                                            React.createElement(UserNew, { onCancel: function () { return _this.setState({ action: UserMgrAction.NONE }); }, onSave: function (id, name, pwd) { _this.createUser(id, name, pwd); } })
+                                            :
+                                                React.createElement(UserEditor, { user: this.state.currentUser, onCancel: function () { return _this.setState({ action: UserMgrAction.NONE }); }, onClearHist: function (u) { return _this.clearUserHistory(u); }, onUpdate: function () { return _this.refreshUserList(); }, onRemove: function (u) { return _this.removeUser(u); } }))))))));
         }
         else {
             return React.createElement("div", null, "User data loading ..................................");

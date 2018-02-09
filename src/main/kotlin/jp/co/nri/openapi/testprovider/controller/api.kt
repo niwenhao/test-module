@@ -1,11 +1,9 @@
 package jp.co.nri.openapi.testprovider.controller
 
 import jp.co.nri.openapi.testprovider.Const
-import jp.co.nri.openapi.testprovider.model.ApiDao
-import jp.co.nri.openapi.testprovider.model.Client
-import jp.co.nri.openapi.testprovider.model.ClientDao
-import jp.co.nri.openapi.testprovider.model.UserDao
+import jp.co.nri.openapi.testprovider.model.*
 import jp.co.nri.openapi.testprovider.model.entity.ProviderApi
+import jp.co.nri.openapi.testprovider.model.entity.ProviderApiHist
 import jp.co.nri.openapi.testprovider.model.entity.ProviderUser
 import org.springframework.web.bind.annotation.*
 import javax.annotation.Resource
@@ -80,6 +78,17 @@ class UserServiceController(
         }
     }
 
+    @RequestMapping("/api/users/{id}", method = arrayOf(RequestMethod.GET))
+    fun userById(
+            session: HttpSession,
+            @PathVariable
+            id: Long
+    ): ProviderUser? {
+        return (session.getAttribute(Const.SK_CLIENT) as Client?)?.let { client ->
+            userDao.find(id)
+        }
+    }
+
     @RequestMapping("/api/users/{id}", method = arrayOf(RequestMethod.DELETE))
     fun remove(
             session: HttpSession,
@@ -100,8 +109,88 @@ class ApiServiceController(
     @RequestMapping("/apis", method = arrayOf(RequestMethod.GET))
     fun list(
             @PathVariable
-            userId: Long
+            userId: Long,
+            session: HttpSession
     ): List<ProviderApi> {
-        return apiDao.getUserApiList(userId)
+        return (session.getAttribute(Const.SK_CLIENT) as Client?)?.let { client ->
+            apiDao.getUserApiList(userId)
+        } ?: listOf()
+    }
+
+    @RequestMapping("/apis", method = arrayOf(RequestMethod.POST))
+    fun create(
+            @PathVariable
+            userId: Long,
+            @RequestBody
+            api: ProviderApi,
+            session: HttpSession
+    ): ProviderApi? {
+        return (session.getAttribute(Const.SK_CLIENT) as Client?)?.let { client ->
+            apiDao.create(userId, api)
+        }
+    }
+
+    @RequestMapping("/apis/{apiId}", method = arrayOf(RequestMethod.GET))
+    fun getById(
+            session: HttpSession,
+            @PathVariable
+            apiId: Long
+    ): ProviderApi? {
+        return apiDao.findById(apiId)
+    }
+
+    @RequestMapping("/apis/{apiId}", method = arrayOf(RequestMethod.PUT))
+    fun update(
+            session: HttpSession,
+            @PathVariable
+            userId: Long,
+            @PathVariable
+            apiId: Long,
+            @RequestBody
+            api: ProviderApi
+    ): ProviderApi? {
+        return (session.getAttribute(Const.SK_CLIENT) as Client?)?.let { client ->
+            api.id = apiId
+            apiDao.update(api)
+        }
+    }
+    @RequestMapping("/apis/{id}", method = arrayOf(RequestMethod.DELETE))
+    fun remove(
+            session: HttpSession,
+            @PathVariable
+            id: Long
+    ): ProviderApi? {
+        return (session.getAttribute(Const.SK_CLIENT) as Client?)?.let { client ->
+            apiDao.remove(id)
+        }
+    }
+}
+
+//@RequestMapping("/api/users/{userId}/apis/{apiId}")
+@RestController
+@RequestMapping("/api/hist")
+class HistoryServiceController(
+        @Resource
+        val histDao: HistoryDao
+) {
+
+    @RequestMapping("/api/{apiId}")
+    fun listByApiId(
+            session: HttpSession,
+            @PathVariable
+            apiId:Long
+    ): List<ProviderApiHist> {
+        return (session.getAttribute(Const.SK_CLIENT) as Client?)?.let {
+            histDao.listByApiId(apiId)
+        } ?: listOf<ProviderApiHist>()
+    }
+
+    @RequestMapping("/hist/{histId}")
+    fun removeById(
+            session: HttpSession,
+            @PathVariable
+            histId: Long
+    ): RemoveHistoryResult {
+        return histDao.removeById(histId)
     }
 }

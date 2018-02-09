@@ -16,8 +16,8 @@ data class ProviderUser(
         var userName: String? = null,
         @Column(length=64)
         var password: String? = null,
-        @OneToMany(targetEntity = ProviderApi::class)
-        var providerApis: List<ProviderApi>? = null
+        @OneToMany(targetEntity = ProviderApi::class, cascade = arrayOf(CascadeType.ALL), mappedBy = "user", fetch = FetchType.LAZY)
+        var providerApis: MutableList<ProviderApi> = mutableListOf()
 )
 
 @Entity
@@ -25,19 +25,19 @@ data class ProviderUser(
 data class ProviderApi(
         @Id
         @GeneratedValue
-        var id: Long?,
+        var id: Long? = null,
         @ManyToOne()
-        var providerUser: ProviderUser?,
+        var user: ProviderUser? = null,
         @Column(length=128)
-        var apiPath: String?,
+        var apiPath: String? = null,
         @Column(length=128)
-        var apiName: String?,
+        var apiName: String? = null,
         @Column(length=512*1024, columnDefinition = "LONG")
-        var conditionJson: String?,
+        var conditionJson: String? = null,
         @Column(length=512*1024, columnDefinition = "LONG")
-        var responseJson: String?,
-        @OneToMany(targetEntity = ProviderApiHist::class)
-        var providerApiHists: List<ProviderApiHist>?
+        var responseJson: String? = null,
+        @OneToMany(targetEntity = ProviderApiHist::class, cascade = arrayOf(CascadeType.ALL), mappedBy = "api", fetch = FetchType.LAZY)
+        var providerApiHists: MutableList<ProviderApiHist> = mutableListOf()
 )
 
 @Entity
@@ -46,8 +46,8 @@ data class ProviderApiHist(
         @Id
         @GeneratedValue
         var id: Long?,
-        @ManyToOne()
-        var providerApi: ProviderApi?,
+        @ManyToOne
+        var api: ProviderApi?,
         @Column
         var accessTime: Long?,
         @Column(length=512*1024, columnDefinition = "LONG")

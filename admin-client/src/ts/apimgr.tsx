@@ -86,6 +86,14 @@ class ApiEditPane extends React.Component<ApiEditProps, ApiEditState> {
     }
   }
 
+  componentWillReceiveProps(props: ApiEditProps, context: any) {
+    this.setState({
+      apiPath: props.api.apiPath,
+      apiName: props.api.apiName,
+      condition: props.api.conditionJson,
+      response: props.api.responseJson
+    })
+  }
   clearHistory() {
     this.props.onClearHistory(this.props.api)
   }
@@ -122,16 +130,16 @@ class ApiEditPane extends React.Component<ApiEditProps, ApiEditState> {
           </tr>
           <tr>
             <td><label>条件</label></td>
-            <td><textarea onChange={(e) => this.setState({condition: e.target.value})}>{this.state.condition}</textarea></td>
+            <td><textarea onChange={(e) => this.setState({condition: e.target.value})} value={this.state.condition}></textarea></td>
           </tr>
           <tr>
             <td><label>レスポンス</label></td>
-            <td><textarea onChange={(e) => this.setState({response: e.target.value})}>{this.state.response}</textarea></td>
+            <td><textarea onChange={(e) => this.setState({response: e.target.value})} value={this.state.response}></textarea></td>
           </tr>
         </table>
         <div>
-          <button onClick={() => this.clearHistory()}>保存</button>
-          <button onClick={() => this.delete()}>保存</button>
+          <button onClick={() => this.clearHistory()}>履歴削除</button>
+          <button onClick={() => this.delete()}>削除</button>
           <button onClick={() => this.save()}>保存</button>
           <button onClick={() => this.cancel()}>キャンセル</button>
         </div>
@@ -179,7 +187,7 @@ export class ApiMgr extends React.Component<RouteComponentProps<ApiMgrRoutParm>,
   }
 
   back() {
-
+    this.props.history.goBack()
   }
 
   refreshApiList() {
@@ -192,28 +200,45 @@ export class ApiMgr extends React.Component<RouteComponentProps<ApiMgrRoutParm>,
     })
   }
 
-  appendUser() {
-
+  appendApi() {
+    this.setState({action: ApiMgrAction.NEW})
   }
 
   selectApi(api: ApiModel) {
-
+    this.setState({
+      currentApi: api,
+      action: ApiMgrAction.EDIT
+    })
   }
 
   showHistory(api: ApiModel) {
-
+    this.props.history.push(`${this.props.match.url}/${api.id}/history`)
   }
 
   createUser(path: string, name: string, con: string, res: string) {
-
+    let props: Api = {
+      apiPath: path,
+      apiName: name,
+      conditionJson: con,
+      responseJson: res
+    }
+    this.state.apis!.create(props, {
+      success: () => this.refreshApiList()
+    })
   }
 
   deleteApi(api: ApiModel) {
-
+    let a = this.state.apis!.get(api.id)
+    a.destroy({
+      success: () => this.refreshApiList()
+    })
   }
   updateApi(api: ApiModel) {
-
+    api.save(null, {
+      success: () => this.refreshApiList()
+    })
   }
+
   clearHistory(api: ApiModel) {
 
   }
@@ -226,21 +251,24 @@ export class ApiMgr extends React.Component<RouteComponentProps<ApiMgrRoutParm>,
   }
 
   render(): React.ReactNode {
-    const ShowApi = (api: ApiModel) => (
-      <tr key={api.id}>
-        <td>
-          <input type='radio'
-                 checked={(this.state.currentApi && this.state.currentApi!.id) == api.id}
-                 onClick={ () => this.selectApi(api)}
-                 value={ api.id }/>
-        </td>
-        <td>{ api.apiPath }</td>
-        <td>{ api.apiName }</td>
-        <td>
-          <a onClick={ () => this.showHistory(api) }>＞＞</a>
-        </td>
-      </tr>
-    )
+    const ShowApi = (api: ApiModel) => {
+      console.log(`api = ${JSON.stringify(api)}`)
+      return (
+        <tr key={api.id}>
+          <td>
+            <input type='radio'
+                  checked={(this.state.currentApi && this.state.currentApi!.id) == api.id}
+                  onClick={ () => this.selectApi(api)}
+                  value={ api.id }/>
+          </td>
+          <td>{ api.apiPath }</td>
+          <td>{ api.apiName }</td>
+          <td>
+            <a onClick={ () => this.showHistory(api) }>＞＞</a>
+          </td>
+        </tr>
+      )
+    }
 
     const SwitchApiPane = function(self: ApiMgr){
       switch(self.state.action) {
@@ -255,7 +283,7 @@ export class ApiMgr extends React.Component<RouteComponentProps<ApiMgrRoutParm>,
                                                     />
       }
     }
-    if (this.state.client && this.state.apis) {
+    if (this.state.client && this.state.apis && this.state.user) {
       return (
         <div>
           <a onClick={ () => this.back() }>＜＜</a>
@@ -269,31 +297,35 @@ export class ApiMgr extends React.Component<RouteComponentProps<ApiMgrRoutParm>,
             <input type='text' readOnly={true} value={`${this.state.user!.userName}(${this.state.user!.userID})`}/>
           </div>
           <table>
+            <tbody>
             <tr>
               <td>
                 <div>
                   <button onClick={ () => this.refreshApiList() }>更新</button>
-                  <button onClick={ () => this.appendUser() }>追加</button>
+                  <button onClick={ () => this.appendApi() }>追加</button>
                 </div>
                 <table>
+                  <tbody>
                   <tr>
                     <td>選択</td>
                     <td>PATH</td>
                     <td>詳細</td>
                     <td>履歴</td>
                   </tr>
-                  { this.state.apis.models.map(ShowApi) }
+                  { this.state.apis.models.map((api) => ShowApi(api)) }
+                  </tbody>
                 </table>
               </td>
               <td>
                 { SwitchApiPane(this) }
               </td>
             </tr>
+            </tbody>
           </table>
         </div>
       )
     } else {
-      <h1>Loading.....................................</h1>
+      return <h1>Loading.....................................</h1>
     }
   }
 }

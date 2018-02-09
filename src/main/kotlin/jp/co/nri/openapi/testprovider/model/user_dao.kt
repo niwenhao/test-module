@@ -1,5 +1,6 @@
 package jp.co.nri.openapi.testprovider.model
 
+import jp.co.nri.openapi.testprovider.model.entity.ProviderApi
 import jp.co.nri.openapi.testprovider.model.entity.ProviderUser
 import org.springframework.stereotype.Component
 import org.springframework.stereotype.Repository
@@ -37,16 +38,20 @@ open class UserDaoImpl(
 
     override fun list(clientKey: String): List<ProviderUser> {
         val query = em.createQuery("select c from ProviderUser c where clientKey = :clientKey", ProviderUser::class.java)
-        return query.setParameter("clientKey", clientKey).resultList
+        return query.setParameter("clientKey", clientKey).resultList.map { u ->
+            ProviderUser(u.id, u.clientKey, u.userID, u.userName, u.password, mutableListOf())
+        }
     }
 
     override fun find(id: Long): ProviderUser? {
-        return em.find(ProviderUser::class.java, id)
+        return em.find(ProviderUser::class.java, id)?.let { user ->
+            ProviderUser(user.id, user.clientKey, user.userID, user.userName, user.password, mutableListOf())
+        }
     }
 
     @Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED)
     override fun create(user: ProviderUser) {
-        val u = ProviderUser(null, user.clientKey, user.userID, user.userName, user.password, listOf())
+        val u = ProviderUser(null, user.clientKey, user.userID, user.userName, user.password, mutableListOf())
         em.persist(u)
     }
 
@@ -58,7 +63,7 @@ open class UserDaoImpl(
     @Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED)
     override fun remove(id: Long):ProviderUser? {
         return em.find(ProviderUser::class.java, id)?.let {  e ->
-            val r = ProviderUser(e.id, e.clientKey, e.userID, e.userName, e.password, listOf())
+            val r = ProviderUser(e.id, e.clientKey, e.userID, e.userName, e.password, mutableListOf())
             em.remove(e)
             r
         }
