@@ -3,7 +3,25 @@ package jp.co.nri.openapi.testprovider.model.entity
 import javax.persistence.*
 
 @Entity
-@Table(name="nri_test_user")
+@Table(name="nri_test_config",
+        indexes = arrayOf(Index(columnList = "name", unique = true)))
+data class ProviderConfig(
+        @Id
+        @GeneratedValue
+        var id: Long? = null,
+        @Column(length = 128)
+        var name: String? = null,
+        @Column(length = 512)
+        var value: String? = null,
+        @Lob
+        @Basic(fetch = FetchType.LAZY)
+        @Column
+        var largeValue: String? = null
+)
+
+@Entity
+@Table(name="nri_test_user",
+        indexes = arrayOf(Index(columnList = "clientKey,userID", unique = true)))
 data class ProviderUser(
         @Id
         @GeneratedValue
@@ -33,7 +51,7 @@ data class ProviderApi(
         @Column(length=128)
         var apiName: String? = null,
         @Column(length=512*1024, columnDefinition = "LONG")
-        var conditionJson: String? = null,
+        var conditionJs: String? = null,
         @Column(length=512*1024, columnDefinition = "LONG")
         var responseJson: String? = null,
         @OneToMany(targetEntity = ProviderApiHist::class, cascade = arrayOf(CascadeType.ALL), mappedBy = "api", fetch = FetchType.LAZY)

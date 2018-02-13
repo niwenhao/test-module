@@ -1,5 +1,7 @@
 package jp.co.nri.openapi.testprovider.model
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import jp.co.nri.openapi.testprovider.model.entity.ProviderApi
 import jp.co.nri.openapi.testprovider.model.entity.ProviderApiHist
 import org.springframework.stereotype.Component
 import org.springframework.stereotype.Repository
@@ -19,6 +21,7 @@ interface HistoryDao {
     fun removeByApiId(id: Long): RemoveHistoryResult
     fun removeByUserId(id: Long): RemoveHistoryResult
     fun removeByClientKey(clientKey: String): RemoveHistoryResult
+    fun addHistory(apiId:Long, req: ApiRequest, res: ApiResponse)
 }
 
 @Repository
@@ -27,6 +30,14 @@ open class HistoryDaoImpl(
         @PersistenceContext
         val em: EntityManager
 ): HistoryDao {
+    @Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED)
+    override fun addHistory(apiId: Long, req: ApiRequest, res: ApiResponse) {
+        val mapping = ObjectMapper()
+        val api = em.find(ProviderApi::class.java, apiId)
+        val hist = ProviderApiHist(null, api, System.currentTimeMillis(), mapping.writeValueAsString(req), mapping.writeValueAsString(res))
+        em.persist(hist)
+    }
+
     override fun listByApiId(apiId: Long): List<ProviderApiHist> {
         val query = em.createQuery("select h from ProviderApiHist h where h.api.id = :id", ProviderApiHist::class.java)
         return query.setParameter("id", apiId).resultList?.map(){ hist ->
