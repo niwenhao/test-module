@@ -246,7 +246,7 @@ export class UserMgr
   }
 
   showApi(u: UserModel) {
-    this.props.history.push(`${this.props.match.url}/users/${u.id}/apis`)
+    this.props.history.push(`${this.props.match.url}/${u.id}/apis`)
   }
 
   render(): React.ReactNode {

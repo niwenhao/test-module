@@ -8,7 +8,6 @@ import jp.co.nri.openapi.testprovider.model.entity.ProviderUser
 import org.springframework.web.bind.annotation.*
 import javax.annotation.Resource
 import javax.servlet.http.HttpSession
-import javax.websocket.server.PathParam
 
 @RestController
 class ClientApiController(
@@ -192,5 +191,53 @@ class HistoryServiceController(
             histId: Long
     ): RemoveHistoryResult {
         return histDao.removeById(histId)
+    }
+}
+
+@RestController
+class ConfigServiceController(
+        @Resource
+        val configDao: ConfigDao
+) {
+    @RequestMapping("/api/configurations", method = arrayOf(RequestMethod.GET))
+    fun list(
+            session: HttpSession
+    ): List<ConfigEntity> {
+        return session.getAttribute(Const.SK_CLIENT)?.let {
+            configDao.list()
+        }?: listOf()
+    }
+
+    @RequestMapping("/api/configurations", method = arrayOf(RequestMethod.POST))
+    fun create(
+            session: HttpSession,
+            @RequestBody
+            pc: ConfigEntity
+    ): ConfigEntity? {
+        return session.getAttribute(Const.SK_CLIENT)?.let {
+            return configDao.create(pc)
+        }
+    }
+
+    @RequestMapping("/api/configurations/{configId}", method = arrayOf(RequestMethod.PUT))
+    fun update(
+            session: HttpSession,
+            @PathVariable
+            configId: Long,
+            @RequestBody
+            pc: ConfigEntity
+    ): ConfigEntity? {
+        return session.getAttribute(Const.SK_CLIENT)?.let {
+            return configDao.update(pc)
+        }
+    }
+
+    @RequestMapping("/api/configurations/{configId}", method = arrayOf(RequestMethod.DELETE))
+    fun delete(
+            session: HttpSession,
+            @PathVariable
+            configId: Long
+    ): ConfigEntity? {
+        return configDao.remove(configId)
     }
 }

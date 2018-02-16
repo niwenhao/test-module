@@ -1,14 +1,9 @@
 package jp.co.nri.openapi.testprovider.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.sun.deploy.net.HttpResponse
 import jp.co.nri.openapi.testprovider.model.*
-import org.springframework.http.HttpRequest
-import org.springframework.stereotype.Controller
-import org.springframework.web.bind.annotation.RequestMapping
 import java.io.ByteArrayInputStream
 import java.net.URLDecoder
-import java.util.*
 import javax.annotation.Resource
 import javax.script.ScriptEngine
 import javax.script.ScriptEngineManager
@@ -19,7 +14,7 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletRequestWrapper
 import javax.servlet.http.HttpServletResponse
 
-class CustomServletInputStream: ServletInputStream {
+class CustomServletInputStream : ServletInputStream {
     private var byteStream: ByteArrayInputStream
 
     constructor(body: ByteArray) {
@@ -75,7 +70,7 @@ class CustomServletInputStream: ServletInputStream {
     }
 }
 
-class CustomHttpServletRequest(req: HttpServletRequest, body: ByteArray): HttpServletRequestWrapper(req) {
+class CustomHttpServletRequest(req: HttpServletRequest, body: ByteArray) : HttpServletRequestWrapper(req) {
     val customReqIS = CustomServletInputStream(body)
 
     override fun getInputStream(): ServletInputStream {
@@ -86,13 +81,13 @@ class CustomHttpServletRequest(req: HttpServletRequest, body: ByteArray): HttpSe
 @WebFilter(urlPatterns = arrayOf("/*"))
 class ApiInvokeAdapter(
         @Resource
-        val propertyDao: PropertyDao,
+        val propertyDao: ConfigDao,
         @Resource
         val apiDao: ApiDao,
         @Resource
         val histDao: HistoryDao,
-        val jsEngine:ScriptEngine = ScriptEngineManager().getEngineByName("nashorn")
-): Filter {
+        val jsEngine: ScriptEngine = ScriptEngineManager().getEngineByName("nashorn")
+) : Filter {
     companion object {
         var config: Map<String, String> = mapOf()
     }
@@ -108,68 +103,83 @@ class ApiInvokeAdapter(
         request?.let { request ->
             val req = request as HttpServletRequest
             response?.let { response ->
-                var processed = false
                 val res = response as HttpServletResponse
+                var processed = false
 
-                var pathKey: String? = req.requestURI.replace("/", ".")
-                var extractAuthTicketJS: String? = null
-                while(pathKey != null)
-                    pathKey = config["authorize.extract${pathKey}.javascript"] ?.let { js ->
-                        extractAuthTicketJS = js
-                        null
-                    } ?: if (pathKey.length > 0) pathKey.replaceAfterLast('.', "") else null
-                assert(extractAuthTicketJS != null)
+                config["api.invoke.cases"]?.let { indexStr ->
+                    indexStr.split(",").forEach { index ->
+                        config["api.invoke.path.pattern.${index}"]?.let { ptn ->
+                            val reg = Regex(ptn)
+                            if (reg.matches(req.requestURI)) {
+                                config["api.invoke.auth-ticket.extract.${index}"]?.let { js ->
+                                    val header = mutableMapOf<String, String>()
+                                    for (hn in req.headerNames.iterator()) {
+                                        req.getHeaders(hn)?.toList()?.first()?.let { v ->
+                                            header[hn] = v
+                                        }
+                                    }
+                                    val query = req.queryString
+                                    val bodyByteArray = ByteArray(req.contentLength)
+                                    var len = req.contentLength
 
-                val header = mutableMapOf<String, String>()
-                for (hn in req.headerNames.iterator()) {
-                    req.getHeaders(hn)?.toList()?.first()?.let { v ->
-                        header[hn] = v
-                    }
-                }
-                val query = req.queryString
-                val bodyByteArray = ByteArray(req.contentLength)
-                var len = req.contentLength
+                                    while (len > 0)
+                                        len = len - req.inputStream.read(bodyByteArray, req.contentLength - len, len)
 
-                while(len > 0)
-                    len = len - req.inputStream.read(bodyByteArray, req.contentLength - len, len)
+                                    val body = String(bodyByteArray, Charsets.UTF_8)
 
-                val body = String(bodyByteArray, Charsets.UTF_8)
+                                    val binding = SimpleBindings(mapOf("path" to req.requestURI, "query" to query, "body" to body, "header" to header))
+                                    val authTicket = jsEngine.eval(js, binding) as String
 
-                val binding = SimpleBindings(mapOf("path" to req.requestURI, "query" to query, "body" to body, "header" to header))
-                val authTicket = jsEngine.eval(extractAuthTicketJS, binding) as String
+                                    val mapping = ObjectMapper()
+                                    val authData = mapping.readValue(URLDecoder.decode(authTicket, "UTF-8"), AuthorizeTicket::class.java)
 
-                val mapping = ObjectMapper()
-                val authData = mapping.readValue(URLDecoder.decode(authTicket, "UTF-8"), AuthorizeTicket::class.java)
+                                    val apiList = apiDao.getInvokedApiList(authData.userId ?: "", req.requestURI)
 
-                val apiList = apiDao.getInvokedApiList(authData.userId?:"", req.requestURI)
+                                    apiList.forEach { api ->
+                                        val binding = SimpleBindings(mapOf("path" to req.requestURI, "query" to query, "body" to body, "header" to header))
+                                        if (!processed && (api.conditionJs == null || jsEngine.eval(api.conditionJs, binding) as Boolean)) {
+                                            processed = true
+                                            val responseData = mapping.readValue(api.responseJson, ApiResponse::class.java)
+                                            res.status = responseData.status ?: 200
+                                            responseData.headers?.forEach { h ->
+                                                res.addHeader(h.name, h.value)
+                                            }
+                                            res.writer.print(responseData.body)
 
-                apiList.forEach { api ->
-                    val binding = SimpleBindings(mapOf("path" to req.requestURI, "query" to query, "body" to body, "header" to header))
-                    if (!processed && jsEngine.eval(api.conditionJs, binding) as Boolean) {
-                        processed = true
-                        val responseData = mapping.readValue(api.responseJson, ApiResponse::class.java)
-                        res.status = responseData.status?:200
-                        responseData.headers?.forEach { h ->
-                            res.addHeader(h.name, h.value)
-                        }
-                        res.writer.print(responseData.body)
+                                            val q = ApiRequest(req.method, null, body)
+                                            val qh = mutableListOf<Header>()
 
-                        val q = ApiRequest(req.method, null, body)
-                        val qh = mutableListOf<Header>()
+                                            for (h in req.headerNames.iterator()) {
+                                                val values = req.getHeaders(h).iterator().forEach { v ->
+                                                    qh += Header(h, v)
+                                                }
+                                            }
 
-                        for(h in req.headerNames.iterator()) {
-                            val values = req.getHeaders(h).iterator().forEach { v ->
-                                qh += Header(h, v)
+                                            q.headers = qh.toTypedArray()
+
+                                            histDao.addHistory(api.id ?: 0, q, responseData)
+                                        }
+                                    }
+                                    if (!processed) {
+                                        processed = true
+                                        res.status = 400
+                                        res.contentType = "text/html"
+                                        res.writer.print("""<!DOCTYPE html>
+                                                         <html>
+                                                         <body>
+                                                         Cann't found adopted API.
+                                                         </body>
+                                                         </html>
+                                                         """)
+                                    }
+
+                                }
                             }
                         }
-
-                        q.headers = qh.toTypedArray()
-
-                        histDao.addHistory(api.id?:0, q, responseData)
                     }
                 }
                 if (!processed) {
-                    chain?.doFilter(CustomHttpServletRequest(req, bodyByteArray), res)
+                    chain?.doFilter(req, res)
                 }
             }
         }

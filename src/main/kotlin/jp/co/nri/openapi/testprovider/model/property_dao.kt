@@ -9,52 +9,69 @@ import org.springframework.transaction.annotation.Transactional
 import javax.persistence.EntityManager
 import javax.persistence.PersistenceContext
 
+data class ConfigEntity(
+        var id: Long? = null,
+        var name: String? = null,
+        var value: String? = null
+)
+
 @Component
-interface PropertyDao {
-    fun getPropertyValue(name: String): String?
-    fun setProperty(name: String, value: String)
-    fun removeProperty(name: String)
+interface ConfigDao {
     fun properties(): Map<String, String>
+    fun list(): List<ConfigEntity>
+    fun create(pc: ConfigEntity): ConfigEntity?
+    fun update(pc: ConfigEntity): ConfigEntity?
+    fun remove(id: Long): ConfigEntity?
 }
 
 @Repository
 @Service
-open class PropertyDaoImpl(
+open class ConfigDaoImpl(
         @PersistenceContext
         val em: EntityManager
-): PropertyDao {
-    override fun getPropertyValue(name: String): String? {
-        val query = em.createQuery("select c from ProviderConfig c where c.name = :name", ProviderConfig::class.java)
-        val resultList = query.setParameter("name", name).resultList
-        assert(resultList.size == 1)
-
-        val property = resultList.first()
-        return property.value ?: property.largeValue
+): ConfigDao {
+    override fun list(): List<ConfigEntity> {
+        return em.createQuery("select c from ProviderConfig c", ProviderConfig::class.java).resultList
+                .map { c ->
+                    ConfigEntity(c.id, c.name, c.value ?: c.largeValue)
+                }
     }
 
     @Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED)
-    override fun setProperty(name: String, value: String) {
-        val query = em.createQuery("select c from ProviderConfig c where c.name = :name", ProviderConfig::class.java)
-        val property = query.setParameter("name", name).resultList.firstOrNull() ?: ProviderConfig(null, name, null, null)
-
-        if (value.toByteArray(Charsets.UTF_8).size < 512) {
-            property.value = value
-            property.largeValue = null
+    override fun create(pc: ConfigEntity): ConfigEntity? {
+        val c = ProviderConfig(null, pc.name)
+        if (pc.value?.toByteArray()?.size?:0 > 512) {
+            c.largeValue = pc.value
         } else {
-            property.value = null
-            property.largeValue = value
+            c.value = pc.value
         }
 
-        em.persist(property)
+        em.persist(c)
+        return pc
     }
 
     @Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED)
-    override fun removeProperty(name: String) {
-        val query = em.createQuery("select c from ProviderConfig c where c.name = :name", ProviderConfig::class.java)
-        query.setParameter("name", name).resultList.firstOrNull()?.let { p ->
-            em.remove(p)
+    override fun update(pc: ConfigEntity): ConfigEntity? {
+        val c = em.find(ProviderConfig::class.java, pc.id)
+        c.name = pc.name
+        if (pc.value?.toByteArray()?.size?:0 > 512) {
+            c.value = null
+            c.largeValue = pc.value
+        } else {
+            c.value = pc.value
+            c.largeValue = null
         }
 
+        em.persist(c)
+        return pc
+    }
+
+    @Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED)
+    override fun remove(id: Long): ConfigEntity? {
+        val c = em.find(ProviderConfig::class.java, id)
+        val r = ConfigEntity(id, c.name, c.value ?: c.largeValue)
+        em.remove(c)
+        return r
     }
 
     override fun properties(): Map<String, String> {

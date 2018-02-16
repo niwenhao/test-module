@@ -55,6 +55,12 @@ export class HistMgr extends React.Component<RouteComponentProps<any>, HistMgrSt
     })
   }
 
+  doDelete(hist: HistoryModel) {
+    let h = this.state.historyList!.get(hist.id)
+    this.state.historyList!.remove(h)
+    h.destroy({ success: () => this.refresh()})
+  }
+
   render(): React.ReactNode {
     let self = this
     if (this.state.client && this.state.user && this.state.api && this.state.historyList) {
@@ -101,17 +107,20 @@ export class HistMgr extends React.Component<RouteComponentProps<any>, HistMgrSt
                       <td>時刻</td>
                       <td>ステータス</td>
                     </tr>
-                    {this.state.historyList!.map(function(h: HistoryModel):ReactNode {
+                    {this.state.historyList!.map(function(h: HistoryModel) {
                       let dt = new Date(h.accessTime)
                       let curr = self.state.currentHistory
                       let id = curr && curr.id
                       return (
                         <tr key={h.id}>
                           <td>
-                            <input type="radio" checked={id == h.id} value="h.id"/>
+                            <input type="radio" checked={id == h.id} value={h.id}/>
                           </td>
                           <td>{dt.toLocaleDateString()}</td>
-                          <td>&nbsp;</td>
+                          <td>{function(h:HistoryModel){
+                            let resp = JSON.parse(h.responseJson)
+                            return <span>{resp.status}</span>
+                            }(h)}</td>
                         </tr>
                       )
                     })}
@@ -139,7 +148,7 @@ export class HistMgr extends React.Component<RouteComponentProps<any>, HistMgrSt
                           </tr>
                         </tbody></table>
                         <div>
-                          <button>削除</button>
+                          <button onClick={() => self.doDelete(self.state.currentHistory!)}>削除</button>
                         </div>
                       </div>
                     )

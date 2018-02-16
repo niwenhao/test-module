@@ -155,3 +155,37 @@ export class HistoryCollection extends Backbone.Collection<HistoryModel> {
   url = () => `/api/hist/api/${this.apiId}`
   model = HistoryModel
 }
+
+export interface Config {
+  name: string
+  value: string
+}
+
+export class ConfigModel extends Backbone.Model implements Config {
+  constructor(attrs?: any, options?:any) {
+    super(attrs, options)
+  }
+
+  get name():string {
+    return this.get("name")
+  }
+
+  set name(v: string) {
+    this.set("name")
+  }
+
+  get value():string {
+    return this.get("value")
+  }
+
+  set value(v: string) {
+    this.set("value")
+  }
+}
+
+export class ConfigCollection extends Backbone.Collection<ConfigModel> {
+
+  url = () => `/api/configurations`
+  model = ConfigModel
+}
+
