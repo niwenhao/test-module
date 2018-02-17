@@ -154,7 +154,7 @@ class UserList extends React.Component<UserListProps, UserListState>
                         </td>
                         <td>{u.userID}</td>
                         <td>{u.userName}</td>
-                        <td><a onClick={ () => self.showApis(u) }>＞＞</a></td>
+                        <td><button onClick={ () => self.showApis(u) }>＞＞</button></td>
                       </tr>
                     )
                   }
@@ -282,6 +282,7 @@ export class UserMgr
       return (
         <div>
           <h1>ユーザメンテナンス</h1>
+          <div><button onClick={() => this.props.history.goBack()}>メニューへ</button></div>
           <div>
             <label>クライアント</label>
             <input type="text" readOnly={true} value={this.state.client}/>

@@ -44,6 +44,9 @@ export class HistMgr extends React.Component<RouteComponentProps<any>, HistMgrSt
 
     let a = new ApiModel()
     a.url = () => `/api/users/${this.userId}/apis/${this.apiId}`
+    a.fetch({
+      success: () => this.setState({api: a})
+    })
 
     this.refresh()
    }
@@ -66,37 +69,34 @@ export class HistMgr extends React.Component<RouteComponentProps<any>, HistMgrSt
     if (this.state.client && this.state.user && this.state.api && this.state.historyList) {
       return (
         <div>
+          <h1>呼出履歴メンテナンス</h1>
           <table>
             <tbody>
               <tr>
-                <td><a>＜＜</a></td>
-                <td>
-                  <h1>呼出履歴メンテナンス</h1>
-                  <table><tbody>
-                    <tr><td>
-                      <label>クライアント</label>
-                    </td><td>
-                      <input type="text" readOnly={true} 
-                       value={`${this.state.client!.clientName}(${this.state.client!.clientKey})`}/>
-                    </td></tr>
-                    <tr><td>
-                      <label>ユーザ</label>
-                    </td><td>
-                      <input type="text" readOnly={true} 
-                       value={`${this.state.user!.userName}(${this.state.user!.userID})`}/>
-                    </td></tr>
-                    <tr><td>
-                      <label>API</label>
-                    </td><td>
-                      <input type="text" readOnly={true} 
-                       value={`${this.state.api!.apiName}(${this.state.api!.apiPath})`}/>
-                    </td></tr>
-                  </tbody></table>
-                </td>
-                <td><button>ログアウト</button></td>
+                <td><button onClick={() => this.props.history.goBack()}>APIメンテへ</button></td>
               </tr>
             </tbody>
           </table>
+          <table><tbody>
+            <tr><td>
+              <label>クライアント</label>
+            </td><td>
+              <input type="text" readOnly={true} 
+                value={`${this.state.client!.clientName}(${this.state.client!.clientKey})`}/>
+            </td></tr>
+            <tr><td>
+              <label>ユーザ</label>
+            </td><td>
+              <input type="text" readOnly={true} 
+                value={`${this.state.user!.userName}(${this.state.user!.userID})`}/>
+            </td></tr>
+            <tr><td>
+              <label>API</label>
+            </td><td>
+              <input type="text" readOnly={true} 
+                value={`${this.state.api!.apiName}(${this.state.api!.apiPath})`}/>
+            </td></tr>
+          </tbody></table>
           <table>
             <tbody>
               <tr>

@@ -37,7 +37,7 @@ namespace create {
             </tr>
             <tr>
               <td><label>値</label></td>
-              <td><input type="text" value={this.state.value} onChange={(e) => this.setState({value: e.target.value})}/></td>
+              <td><textarea value={this.state.value} onChange={(e) => this.setState({value: e.target.value})}/></td>
             </tr>
           </tbody></table>
           <div>
@@ -96,7 +96,7 @@ namespace edit {
             </tr>
             <tr>
               <td><label>値</label></td>
-              <td><input type="text" value={this.state.value} onChange={(e) => this.setState({value: e.target.value})}/></td>
+              <td><textarea value={this.state.value} onChange={(e) => this.setState({value: e.target.value})}/></td>
             </tr>
           </tbody></table>
           <div>
@@ -183,11 +183,12 @@ export class ConfigMgr extends React.Component<RouteComponentProps<any>, ConfigM
 
   doDelete(conf:ConfigModel) {
     let c = this.state.configurations!.get(conf.id)
-    this.state.configurations!.remove(c)
+    //this.state.configurations!.remove(c)
     c.destroy({ success: () => this.doRefresh() })
   }
 
   doSave(conf:ConfigModel) {
+    console.log(`c => ${conf.name}`)
     conf.save({ success: () => this.doRefresh() })
   }
 

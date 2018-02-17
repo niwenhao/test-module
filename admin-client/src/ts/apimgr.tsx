@@ -264,7 +264,7 @@ export class ApiMgr extends React.Component<RouteComponentProps<ApiMgrRoutParm>,
           <td>{ api.apiPath }</td>
           <td>{ api.apiName }</td>
           <td>
-            <a onClick={ () => this.showHistory(api) }>＞＞</a>
+            <button onClick={ () => this.showHistory(api) }>＞＞</button>
           </td>
         </tr>
       )
@@ -286,8 +286,8 @@ export class ApiMgr extends React.Component<RouteComponentProps<ApiMgrRoutParm>,
     if (this.state.client && this.state.apis && this.state.user) {
       return (
         <div>
-          <a onClick={ () => this.back() }>＜＜</a>
           <h1>APIメンテナンス</h1>
+          <div><button onClick={() => this.back()}>ユーザメンテへ</button></div>
           <div>
             <label>クライアント</label>
             <input type='text' readOnly={true} value={`${this.state.client!.clientName}(${this.state.client!.clientKey})`}/>

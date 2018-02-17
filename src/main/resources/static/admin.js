@@ -417,7 +417,7 @@ var ApiMgr = /** @class */ (function (_super) {
                 React.createElement("td", null, api.apiPath),
                 React.createElement("td", null, api.apiName),
                 React.createElement("td", null,
-                    React.createElement("a", { onClick: function () { return _this.showHistory(api); } }, "\uFF1E\uFF1E"))));
+                    React.createElement("button", { onClick: function () { return _this.showHistory(api); } }, "\uFF1E\uFF1E"))));
         };
         var SwitchApiPane = function (self) {
             switch (self.state.action) {
@@ -428,8 +428,9 @@ var ApiMgr = /** @class */ (function (_super) {
         };
         if (this.state.client && this.state.apis && this.state.user) {
             return (React.createElement("div", null,
-                React.createElement("a", { onClick: function () { return _this.back(); } }, "\uFF1C\uFF1C"),
                 React.createElement("h1", null, "API\u30E1\u30F3\u30C6\u30CA\u30F3\u30B9"),
+                React.createElement("div", null,
+                    React.createElement("button", { onClick: function () { return _this.back(); } }, "\u30E6\u30FC\u30B6\u30E1\u30F3\u30C6\u3078")),
                 React.createElement("div", null,
                     React.createElement("label", null, "\u30AF\u30E9\u30A4\u30A2\u30F3\u30C8"),
                     React.createElement("input", { type: 'text', readOnly: true, value: this.state.client.clientName + "(" + this.state.client.clientKey + ")" })),
@@ -674,7 +675,7 @@ var ConfigModel = /** @class */ (function (_super) {
             return this.get("name");
         },
         set: function (v) {
-            this.set("name");
+            this.set("name", v);
         },
         enumerable: true,
         configurable: true
@@ -684,7 +685,7 @@ var ConfigModel = /** @class */ (function (_super) {
             return this.get("value");
         },
         set: function (v) {
-            this.set("value");
+            this.set("value", v);
         },
         enumerable: true,
         configurable: true
@@ -751,7 +752,7 @@ var create;
                             React.createElement("td", null,
                                 React.createElement("label", null, "\u5024")),
                             React.createElement("td", null,
-                                React.createElement("input", { type: "text", value: this.state.value, onChange: function (e) { return _this.setState({ value: e.target.value }); } }))))),
+                                React.createElement("textarea", { value: this.state.value, onChange: function (e) { return _this.setState({ value: e.target.value }); } }))))),
                 React.createElement("div", null,
                     React.createElement("button", { onClick: function () { return _this.toCancel(); } }, "\u30AD\u30E3\u30F3\u30BB\u30EB"),
                     React.createElement("button", { onClick: function () { return _this.toSave(); } }, "\u4FDD\u5B58"))));
@@ -798,7 +799,7 @@ var edit;
                             React.createElement("td", null,
                                 React.createElement("label", null, "\u5024")),
                             React.createElement("td", null,
-                                React.createElement("input", { type: "text", value: this.state.value, onChange: function (e) { return _this.setState({ value: e.target.value }); } }))))),
+                                React.createElement("textarea", { value: this.state.value, onChange: function (e) { return _this.setState({ value: e.target.value }); } }))))),
                 React.createElement("div", null,
                     React.createElement("button", { onClick: function () { return _this.toCancel(); } }, "\u30AD\u30E3\u30F3\u30BB\u30EB"),
                     React.createElement("button", { onClick: function () { return _this.toDelete(); } }, "\u524A\u9664"),
@@ -874,11 +875,12 @@ var ConfigMgr = /** @class */ (function (_super) {
     ConfigMgr.prototype.doDelete = function (conf) {
         var _this = this;
         var c = this.state.configurations.get(conf.id);
-        this.state.configurations.remove(c);
+        //this.state.configurations!.remove(c)
         c.destroy({ success: function () { return _this.doRefresh(); } });
     };
     ConfigMgr.prototype.doSave = function (conf) {
         var _this = this;
+        console.log("c => " + conf.name);
         conf.save({ success: function () { return _this.doRefresh(); } });
     };
     ConfigMgr.prototype.render = function () {
@@ -971,6 +973,9 @@ var HistMgr = /** @class */ (function (_super) {
         });
         var a = new entities_1.ApiModel();
         a.url = function () { return "/api/users/" + _this.userId + "/apis/" + _this.apiId; };
+        a.fetch({
+            success: function () { return _this.setState({ api: a }); }
+        });
         this.refresh();
     };
     HistMgr.prototype.refresh = function () {
@@ -987,35 +992,33 @@ var HistMgr = /** @class */ (function (_super) {
         h.destroy({ success: function () { return _this.refresh(); } });
     };
     HistMgr.prototype.render = function () {
+        var _this = this;
         var self = this;
         if (this.state.client && this.state.user && this.state.api && this.state.historyList) {
             return (React.createElement("div", null,
+                React.createElement("h1", null, "\u547C\u51FA\u5C65\u6B74\u30E1\u30F3\u30C6\u30CA\u30F3\u30B9"),
                 React.createElement("table", null,
                     React.createElement("tbody", null,
                         React.createElement("tr", null,
                             React.createElement("td", null,
-                                React.createElement("a", null, "\uFF1C\uFF1C")),
+                                React.createElement("button", { onClick: function () { return _this.props.history.goBack(); } }, "API\u30E1\u30F3\u30C6\u3078"))))),
+                React.createElement("table", null,
+                    React.createElement("tbody", null,
+                        React.createElement("tr", null,
                             React.createElement("td", null,
-                                React.createElement("h1", null, "\u547C\u51FA\u5C65\u6B74\u30E1\u30F3\u30C6\u30CA\u30F3\u30B9"),
-                                React.createElement("table", null,
-                                    React.createElement("tbody", null,
-                                        React.createElement("tr", null,
-                                            React.createElement("td", null,
-                                                React.createElement("label", null, "\u30AF\u30E9\u30A4\u30A2\u30F3\u30C8")),
-                                            React.createElement("td", null,
-                                                React.createElement("input", { type: "text", readOnly: true, value: this.state.client.clientName + "(" + this.state.client.clientKey + ")" }))),
-                                        React.createElement("tr", null,
-                                            React.createElement("td", null,
-                                                React.createElement("label", null, "\u30E6\u30FC\u30B6")),
-                                            React.createElement("td", null,
-                                                React.createElement("input", { type: "text", readOnly: true, value: this.state.user.userName + "(" + this.state.user.userID + ")" }))),
-                                        React.createElement("tr", null,
-                                            React.createElement("td", null,
-                                                React.createElement("label", null, "API")),
-                                            React.createElement("td", null,
-                                                React.createElement("input", { type: "text", readOnly: true, value: this.state.api.apiName + "(" + this.state.api.apiPath + ")" })))))),
+                                React.createElement("label", null, "\u30AF\u30E9\u30A4\u30A2\u30F3\u30C8")),
                             React.createElement("td", null,
-                                React.createElement("button", null, "\u30ED\u30B0\u30A2\u30A6\u30C8"))))),
+                                React.createElement("input", { type: "text", readOnly: true, value: this.state.client.clientName + "(" + this.state.client.clientKey + ")" }))),
+                        React.createElement("tr", null,
+                            React.createElement("td", null,
+                                React.createElement("label", null, "\u30E6\u30FC\u30B6")),
+                            React.createElement("td", null,
+                                React.createElement("input", { type: "text", readOnly: true, value: this.state.user.userName + "(" + this.state.user.userID + ")" }))),
+                        React.createElement("tr", null,
+                            React.createElement("td", null,
+                                React.createElement("label", null, "API")),
+                            React.createElement("td", null,
+                                React.createElement("input", { type: "text", readOnly: true, value: this.state.api.apiName + "(" + this.state.api.apiPath + ")" }))))),
                 React.createElement("table", null,
                     React.createElement("tbody", null,
                         React.createElement("tr", null,
@@ -1093,7 +1096,9 @@ function MenuPane(props) {
         React.createElement("div", null,
             React.createElement("button", { onClick: function () { return doConfig(); } }, "\u8A2D\u5B9A\u7BA1\u7406")),
         React.createElement("div", null,
-            React.createElement("button", { onClick: function () { return doUserApi(); } }, "\u30E6\u30FC\u30B6\u30FBAPI\u7BA1\u7406"))));
+            React.createElement("button", { onClick: function () { return doUserApi(); } }, "\u30E6\u30FC\u30B6\u30FBAPI\u7BA1\u7406")),
+        React.createElement("div", null,
+            React.createElement("button", { onClick: function () { return window.open("/test-data-manager/index", "_self"); } }, "\u30ED\u30B0\u30A2\u30A6\u30C8"))));
 }
 function MainPane(props) {
     return (React.createElement(react_router_dom_1.BrowserRouter, null,
@@ -1223,7 +1228,7 @@ var UserList = /** @class */ (function (_super) {
                                 React.createElement("td", null, u.userID),
                                 React.createElement("td", null, u.userName),
                                 React.createElement("td", null,
-                                    React.createElement("a", { onClick: function () { return self.showApis(u); } }, "\uFF1E\uFF1E"))));
+                                    React.createElement("button", { onClick: function () { return self.showApis(u); } }, "\uFF1E\uFF1E"))));
                         })))));
         }
         else {
@@ -1325,6 +1330,8 @@ var UserMgr = /** @class */ (function (_super) {
         if (this.state.client && this.state.users) {
             return (React.createElement("div", null,
                 React.createElement("h1", null, "\u30E6\u30FC\u30B6\u30E1\u30F3\u30C6\u30CA\u30F3\u30B9"),
+                React.createElement("div", null,
+                    React.createElement("button", { onClick: function () { return _this.props.history.goBack(); } }, "\u30E1\u30CB\u30E5\u30FC\u3078")),
                 React.createElement("div", null,
                     React.createElement("label", null, "\u30AF\u30E9\u30A4\u30A2\u30F3\u30C8"),
                     React.createElement("input", { type: "text", readOnly: true, value: this.state.client }),

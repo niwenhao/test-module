@@ -18,6 +18,7 @@ function MenuPane(props: RouteComponentProps<any>) {
     <div>
       <div><button onClick={() => doConfig()}>設定管理</button></div>
       <div><button onClick={() => doUserApi()}>ユーザ・API管理</button></div>
+      <div><button onClick={() => window.open("/test-data-manager/index", "_self")}>ログアウト</button></div>
     </div>
   )
 }

@@ -8,7 +8,7 @@ html(lang: 'ja') {
     body {
         h1("テスト用ログイン画面")
         div {
-            div(error.message, id: "error_message")
+            div(error["message"], id: "error_message")
             form(acton: "login", method="post") {
                 input("", type: "hidden", name: "action", value: "login")
                 input("", type: "hidden", name: "sessionID", value: sessionId)

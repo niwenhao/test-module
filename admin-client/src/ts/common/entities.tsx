@@ -171,7 +171,7 @@ export class ConfigModel extends Backbone.Model implements Config {
   }
 
   set name(v: string) {
-    this.set("name")
+    this.set("name", v)
   }
 
   get value():string {
@@ -179,7 +179,7 @@ export class ConfigModel extends Backbone.Model implements Config {
   }
 
   set value(v: string) {
-    this.set("value")
+    this.set("value", v)
   }
 }
 
