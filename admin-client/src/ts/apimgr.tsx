@@ -1,12 +1,14 @@
 import * as React from "react"
 import { BrowserRouter, Route, Link, RouteComponentProps } from "react-router-dom"
-import { ClientModel, UserModel, Api, ApiModel, ApiCollection  } from './common/entities'
+import { ClientModel, UserModel, Api, ApiModel, ApiCollection, RequestData, ResponseData } from './common/entities'
 
 interface ApiNewState {
   apiPath: string
   apiName: string
   condition: string
-  response: string
+  status: string;
+  headers: string;
+  body: string;
 }
 interface ApiNewProps {
   onSave: (path: string, name: string, con: string, res: string) => void
@@ -19,12 +21,26 @@ class ApiNewPane extends React.Component<ApiNewProps, ApiNewState> {
       apiPath: "",
       apiName: "",
       condition: "",
-      response: ""
+      status: "200",
+      headers: "",
+      body: ""
     }
   }
 
   save() {
-    this.props.onSave(this.state.apiPath, this.state.apiName, this.state.condition, this.state.response)
+    let responseData : ResponseData = {
+      status: parseInt(this.state.status),
+      headers: this.state.headers.split(/\n/).map(function(u: string) {
+        let header = u.split(/: */)
+        return {
+          name: header[0],
+          value: header[1]
+        }
+      }),
+      body: this.state.body
+    }
+
+    this.props.onSave(this.state.apiPath, this.state.apiName, this.state.condition, JSON.stringify(responseData))
   }
 
   cancel() {
@@ -47,11 +63,19 @@ class ApiNewPane extends React.Component<ApiNewProps, ApiNewState> {
           </tr>
           <tr>
             <td id="label"><label>条件</label></td>
-            <td id="value"><textarea onChange={(e) => this.setState({condition: e.target.value})}>{this.state.condition}</textarea></td>
+            <td id="value"><textarea onChange={(e) => this.setState({condition: e.target.value})}></textarea></td>
           </tr>
           <tr>
-            <td id="label"><label>レスポンス</label></td>
-            <td id="value"><textarea onChange={(e) => this.setState({response: e.target.value})}>{this.state.response}</textarea></td>
+            <td id="label"><label>ステータス</label></td>
+            <td id="value"><input type="text" onChange={(e) => this.setState({status: e.target.value})}/></td>
+          </tr>
+          <tr>
+            <td id="label"><label>ヘッダー</label></td>
+            <td id="value"><textarea onChange={(e) => this.setState({headers: e.target.value})}></textarea></td>
+          </tr>
+          <tr>
+            <td id="label"><label>ボディ</label></td>
+            <td id="value"><textarea onChange={(e) => this.setState({body: e.target.value})}></textarea></td>
           </tr>
         </table>
         <div id="button_area">
@@ -67,7 +91,9 @@ interface ApiEditState {
   apiPath: string
   apiName: string
   condition: string
-  response: string
+  status: string;
+  headers: string;
+  body: string;
 }
 interface ApiEditProps {
   api: ApiModel
@@ -79,20 +105,29 @@ interface ApiEditProps {
 class ApiEditPane extends React.Component<ApiEditProps, ApiEditState> {
   constructor(props: ApiEditProps) {
     super(props)
+
+    let responseData = JSON.parse(props.api.responseJson) as ResponseData
+
     this.state = {
       apiPath: props.api.apiPath,
       apiName: props.api.apiName,
       condition: props.api.conditionJs,
-      response: props.api.responseJson
+      status: responseData.status.toString(),
+      headers: responseData.headers.map((u)=> `${u.name}: ${u.value}`).join("\n"),
+      body: responseData.body
     }
   }
 
   componentWillReceiveProps(props: ApiEditProps, context: any) {
+    let responseData = JSON.parse(props.api.responseJson) as ResponseData
+
     this.setState({
       apiPath: props.api.apiPath,
       apiName: props.api.apiName,
       condition: props.api.conditionJs,
-      response: props.api.responseJson
+      status: responseData.status.toString(),
+      headers: responseData.headers.map((u)=> `${u.name}: ${u.value}`).join("\n"),
+      body: responseData.body
     })
   }
   clearHistory() {
@@ -104,10 +139,22 @@ class ApiEditPane extends React.Component<ApiEditProps, ApiEditState> {
   }
 
   save() {
+    let responseData : ResponseData = {
+      status: parseInt(this.state.status),
+      headers: this.state.headers.split(/\n/).map(function(u: string) {
+        let header = u.split(/: */)
+        return {
+          name: header[0],
+          value: header[1]
+        }
+      }),
+      body: this.state.body
+    }
+
     this.props.api.apiPath = this.state.apiPath
     this.props.api.apiName = this.state.apiName
     this.props.api.conditionJs = this.state.condition
-    this.props.api.responseJson = this.state.response
+    this.props.api.responseJson = JSON.stringify(responseData)
 
     this.props.onSave(this.props.api)
   }

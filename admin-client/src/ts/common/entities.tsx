@@ -189,3 +189,20 @@ export class ConfigCollection extends Backbone.Collection<ConfigModel> {
   model = ConfigModel
 }
 
+export type RequestData = {
+      method: string, 
+      headers: { 
+        name: string, 
+        value: string
+      }[],
+      body: string
+    }
+
+export type ResponseData = {
+      status: number,
+      headers: {
+        name: string,
+        value: string
+      }[],
+      body: string
+    }
