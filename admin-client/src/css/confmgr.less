@@ -1,0 +1,79 @@
+div#confmgr {
+  margin-left: auto;
+  margin-right: auto;
+  width: 1400px;
+
+  div#button_area {
+    width: 100%;
+    text-align: left;
+
+    button {
+      width: 150px;
+      height: 40px;
+    }
+  }
+
+  #main_area {
+    width: 100%;
+
+    #list_pane {
+      vertical-align: top;
+      padding-right: 20px;
+
+      table {
+        border-collapse: collapse;
+
+        #title {
+          background-color: lightblue;
+        }
+        #select_column {
+          width: 40px;
+          .list_cell
+        }
+        #key_column {
+          width: 200px;
+          .list_cell
+        }
+        #value_column {
+          width: 500px;
+          .list_cell
+        }
+      }
+    }
+    #detail_pane {
+      width: 600px;
+      padding-left: 20px;
+      vertical-align: top;
+
+      #input_pane {
+        #label {
+          width: 100px;
+          vertical-align: top;
+        }
+
+        #value {
+          width: 500px;
+
+          input {
+            width: 100%;
+          }
+
+          textarea {
+            width: 100%;
+            height: 250px;
+            resize: vertical;
+          }
+        }
+
+        button_area {
+          width: 100%;
+          text-align: right;
+          button {
+            width: 150px;
+            height: 40px;
+          }
+        }
+      }
+    }
+  }
+}
