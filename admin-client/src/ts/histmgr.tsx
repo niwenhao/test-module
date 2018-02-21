@@ -1,7 +1,7 @@
 import * as React from "react"
 import * as Backbone from 'backbone'
 
-import { ClientModel ,UserModel, ApiModel, HistoryModel, HistoryCollection } from './common/entities'
+import { ClientModel ,UserModel, ApiModel, HistoryModel, HistoryCollection, RequestData, ResponseData } from './common/entities'
 import { BrowserRouter, Route, Link, RouteComponentProps } from "react-router-dom"
 
 interface HistMgrState {
@@ -77,23 +77,6 @@ export class HistMgr extends React.Component<RouteComponentProps<any>, HistMgrSt
     type DetailProps = {
       history: HistoryModel, 
       onDelete: (h: HistoryModel) => void
-    }
-
-    type RequestData = {
-      method: string, 
-      headers: { 
-        name: string, 
-        value: string
-      }[],
-      body: string
-    }
-    type ResponseData = {
-      status: number,
-      headers: {
-        name: string,
-        value: string
-      }[],
-      body: string
     }
 
     if (this.state.client && this.state.user && this.state.api && this.state.historyList) {
