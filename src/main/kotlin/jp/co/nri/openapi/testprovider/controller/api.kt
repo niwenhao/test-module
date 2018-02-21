@@ -184,7 +184,7 @@ class HistoryServiceController(
         } ?: listOf<ProviderApiHist>()
     }
 
-    @RequestMapping("/hist/{histId}")
+    @RequestMapping(path = arrayOf("/api/{apiId}/{histId}"), method = arrayOf(RequestMethod.DELETE))
     fun removeById(
             session: HttpSession,
             @PathVariable

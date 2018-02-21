@@ -219,30 +219,31 @@ var ApiNewPane = /** @class */ (function (_super) {
     };
     ApiNewPane.prototype.render = function () {
         var _this = this;
-        return (React.createElement("div", null,
-            React.createElement("h1", null, "API\u8FFD\u52A0"),
-            React.createElement("table", null,
+        return (React.createElement("div", { id: "detail_pane" },
+            React.createElement("h2", null, "API\u8FFD\u52A0"),
+            React.createElement("hr", null),
+            React.createElement("table", { id: "input_pane" },
                 React.createElement("tr", null,
-                    React.createElement("td", null,
+                    React.createElement("td", { id: "label" },
                         React.createElement("label", null, "PATH")),
-                    React.createElement("td", null,
+                    React.createElement("td", { id: "value" },
                         React.createElement("input", { type: "text", value: this.state.apiPath, onChange: function (e) { return _this.setState({ apiPath: e.target.value }); } }))),
                 React.createElement("tr", null,
-                    React.createElement("td", null,
+                    React.createElement("td", { id: "label" },
                         React.createElement("label", null, "\u8A73\u7D30")),
-                    React.createElement("td", null,
+                    React.createElement("td", { id: "value" },
                         React.createElement("input", { type: "text", value: this.state.apiName, onChange: function (e) { return _this.setState({ apiName: e.target.value }); } }))),
                 React.createElement("tr", null,
-                    React.createElement("td", null,
+                    React.createElement("td", { id: "label" },
                         React.createElement("label", null, "\u6761\u4EF6")),
-                    React.createElement("td", null,
+                    React.createElement("td", { id: "value" },
                         React.createElement("textarea", { onChange: function (e) { return _this.setState({ condition: e.target.value }); } }, this.state.condition))),
                 React.createElement("tr", null,
-                    React.createElement("td", null,
+                    React.createElement("td", { id: "label" },
                         React.createElement("label", null, "\u30EC\u30B9\u30DD\u30F3\u30B9")),
-                    React.createElement("td", null,
+                    React.createElement("td", { id: "value" },
                         React.createElement("textarea", { onChange: function (e) { return _this.setState({ response: e.target.value }); } }, this.state.response)))),
-            React.createElement("div", null,
+            React.createElement("div", { id: "button_area" },
                 React.createElement("button", { onClick: function () { return _this.save(); } }, "\u4FDD\u5B58"),
                 React.createElement("button", { onClick: function () { return _this.cancel(); } }, "\u30AD\u30E3\u30F3\u30BB\u30EB"))));
     };
@@ -255,7 +256,7 @@ var ApiEditPane = /** @class */ (function (_super) {
         _this.state = {
             apiPath: props.api.apiPath,
             apiName: props.api.apiName,
-            condition: props.api.conditionJson,
+            condition: props.api.conditionJs,
             response: props.api.responseJson
         };
         return _this;
@@ -264,7 +265,7 @@ var ApiEditPane = /** @class */ (function (_super) {
         this.setState({
             apiPath: props.api.apiPath,
             apiName: props.api.apiName,
-            condition: props.api.conditionJson,
+            condition: props.api.conditionJs,
             response: props.api.responseJson
         });
     };
@@ -277,7 +278,7 @@ var ApiEditPane = /** @class */ (function (_super) {
     ApiEditPane.prototype.save = function () {
         this.props.api.apiPath = this.state.apiPath;
         this.props.api.apiName = this.state.apiName;
-        this.props.api.conditionJson = this.state.condition;
+        this.props.api.conditionJs = this.state.condition;
         this.props.api.responseJson = this.state.response;
         this.props.onSave(this.props.api);
     };
@@ -286,28 +287,28 @@ var ApiEditPane = /** @class */ (function (_super) {
     };
     ApiEditPane.prototype.render = function () {
         var _this = this;
-        return (React.createElement("div", null,
+        return (React.createElement("div", { id: "detail_pane" },
             React.createElement("h1", null, "API\u5909\u66F4"),
-            React.createElement("table", null,
+            React.createElement("table", { id: "input_pane" },
                 React.createElement("tr", null,
-                    React.createElement("td", null,
+                    React.createElement("td", { id: "label" },
                         React.createElement("label", null, "PATH")),
-                    React.createElement("td", null,
+                    React.createElement("td", { id: "value" },
                         React.createElement("input", { type: "text", value: this.state.apiPath, onChange: function (e) { return _this.setState({ apiPath: e.target.value }); } }))),
                 React.createElement("tr", null,
-                    React.createElement("td", null,
+                    React.createElement("td", { id: "label" },
                         React.createElement("label", null, "\u8A73\u7D30")),
-                    React.createElement("td", null,
+                    React.createElement("td", { id: "value" },
                         React.createElement("input", { type: "text", value: this.state.apiName, onChange: function (e) { return _this.setState({ apiName: e.target.value }); } }))),
                 React.createElement("tr", null,
-                    React.createElement("td", null,
+                    React.createElement("td", { id: "label" },
                         React.createElement("label", null, "\u6761\u4EF6")),
-                    React.createElement("td", null,
+                    React.createElement("td", { id: "value" },
                         React.createElement("textarea", { onChange: function (e) { return _this.setState({ condition: e.target.value }); }, value: this.state.condition }))),
                 React.createElement("tr", null,
-                    React.createElement("td", null,
+                    React.createElement("td", { id: "label" },
                         React.createElement("label", null, "\u30EC\u30B9\u30DD\u30F3\u30B9")),
-                    React.createElement("td", null,
+                    React.createElement("td", { id: "value" },
                         React.createElement("textarea", { onChange: function (e) { return _this.setState({ response: e.target.value }); }, value: this.state.response })))),
             React.createElement("div", null,
                 React.createElement("button", { onClick: function () { return _this.clearHistory(); } }, "\u5C65\u6B74\u524A\u9664"),
@@ -379,7 +380,7 @@ var ApiMgr = /** @class */ (function (_super) {
         var props = {
             apiPath: path,
             apiName: name,
-            conditionJson: con,
+            conditionJs: con,
             responseJson: res
         };
         this.state.apis.create(props, {
@@ -412,11 +413,11 @@ var ApiMgr = /** @class */ (function (_super) {
         var ShowApi = function (api) {
             console.log("api = " + JSON.stringify(api));
             return (React.createElement("tr", { key: api.id },
-                React.createElement("td", null,
+                React.createElement("td", { id: "select_column" },
                     React.createElement("input", { type: 'radio', checked: (_this.state.currentApi && _this.state.currentApi.id) == api.id, onClick: function () { return _this.selectApi(api); }, value: api.id })),
-                React.createElement("td", null, api.apiPath),
-                React.createElement("td", null, api.apiName),
-                React.createElement("td", null,
+                React.createElement("td", { id: "path_column" }, api.apiPath),
+                React.createElement("td", { id: "name_column" }, api.apiName),
+                React.createElement("td", { id: "sub_column" },
                     React.createElement("button", { onClick: function () { return _this.showHistory(api); } }, "\uFF1E\uFF1E"))));
         };
         var SwitchApiPane = function (self) {
@@ -427,30 +428,30 @@ var ApiMgr = /** @class */ (function (_super) {
             }
         };
         if (this.state.client && this.state.apis && this.state.user) {
-            return (React.createElement("div", null,
+            return (React.createElement("div", { id: "apimgr" },
                 React.createElement("h1", null, "API\u30E1\u30F3\u30C6\u30CA\u30F3\u30B9"),
-                React.createElement("div", null,
-                    React.createElement("button", { onClick: function () { return _this.back(); } }, "\u30E6\u30FC\u30B6\u30E1\u30F3\u30C6\u3078")),
-                React.createElement("div", null,
+                React.createElement("hr", null),
+                React.createElement("div", { id: "button_area" },
+                    React.createElement("button", { onClick: function () { return _this.back(); } }, "\u30E6\u30FC\u30B6\u30E1\u30F3\u30C6\u3078"),
+                    React.createElement("button", { onClick: function () { return _this.refreshApiList(); } }, "\u66F4\u65B0"),
+                    React.createElement("button", { onClick: function () { return _this.appendApi(); } }, "\u8FFD\u52A0")),
+                React.createElement("div", { id: "description" },
                     React.createElement("label", null, "\u30AF\u30E9\u30A4\u30A2\u30F3\u30C8"),
                     React.createElement("input", { type: 'text', readOnly: true, value: this.state.client.clientName + "(" + this.state.client.clientKey + ")" })),
-                React.createElement("div", null,
+                React.createElement("div", { id: "description" },
                     React.createElement("label", null, "\u30E6\u30FC\u30B6"),
                     React.createElement("input", { type: 'text', readOnly: true, value: this.state.user.userName + "(" + this.state.user.userID + ")" })),
-                React.createElement("table", null,
+                React.createElement("table", { id: "main_area" },
                     React.createElement("tbody", null,
                         React.createElement("tr", null,
-                            React.createElement("td", null,
-                                React.createElement("div", null,
-                                    React.createElement("button", { onClick: function () { return _this.refreshApiList(); } }, "\u66F4\u65B0"),
-                                    React.createElement("button", { onClick: function () { return _this.appendApi(); } }, "\u8FFD\u52A0")),
+                            React.createElement("td", { id: "list_pane" },
                                 React.createElement("table", null,
                                     React.createElement("tbody", null,
-                                        React.createElement("tr", null,
-                                            React.createElement("td", null, "\u9078\u629E"),
-                                            React.createElement("td", null, "PATH"),
-                                            React.createElement("td", null, "\u8A73\u7D30"),
-                                            React.createElement("td", null, "\u5C65\u6B74")),
+                                        React.createElement("tr", { id: "title" },
+                                            React.createElement("td", { id: "select_column" }, "\u9078\u629E"),
+                                            React.createElement("td", { id: "path_column" }, "PATH"),
+                                            React.createElement("td", { id: "name_column" }, "\u8A73\u7D30"),
+                                            React.createElement("td", { id: "sub_column" }, "\u5C65\u6B74")),
                                         this.state.apis.models.map(function (api) { return ShowApi(api); })))),
                             React.createElement("td", null, SwitchApiPane(this)))))));
         }
@@ -580,12 +581,12 @@ var ApiModel = /** @class */ (function (_super) {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(ApiModel.prototype, "conditionJson", {
+    Object.defineProperty(ApiModel.prototype, "conditionJs", {
         get: function () {
-            return this.get('conditionJson');
+            return this.get('conditionJs');
         },
         set: function (v) {
-            this.set('conditionJson', v);
+            this.set('conditionJs', v);
         },
         enumerable: true,
         configurable: true
@@ -740,20 +741,20 @@ var create;
         };
         CreatePane.prototype.render = function () {
             var _this = this;
-            return (React.createElement("div", null,
+            return (React.createElement("div", { id: "input_pane" },
                 React.createElement("table", null,
                     React.createElement("tbody", null,
                         React.createElement("tr", null,
-                            React.createElement("td", null,
+                            React.createElement("td", { id: "label" },
                                 React.createElement("label", null, "\u30AD\u30FC")),
-                            React.createElement("td", null,
+                            React.createElement("td", { id: "value" },
                                 React.createElement("input", { type: "text", value: this.state.name, onChange: function (e) { return _this.setState({ name: e.target.value }); } }))),
                         React.createElement("tr", null,
-                            React.createElement("td", null,
+                            React.createElement("td", { id: "label" },
                                 React.createElement("label", null, "\u5024")),
-                            React.createElement("td", null,
+                            React.createElement("td", { id: "value" },
                                 React.createElement("textarea", { value: this.state.value, onChange: function (e) { return _this.setState({ value: e.target.value }); } }))))),
-                React.createElement("div", null,
+                React.createElement("div", { id: "button_area" },
                     React.createElement("button", { onClick: function () { return _this.toCancel(); } }, "\u30AD\u30E3\u30F3\u30BB\u30EB"),
                     React.createElement("button", { onClick: function () { return _this.toSave(); } }, "\u4FDD\u5B58"))));
         };
@@ -785,22 +786,30 @@ var edit;
             c.value = this.state.value;
             this.props.onSave(c);
         };
+        EditPane.prototype.componentWillReceiveProps = function (nextProps, nextContext) {
+            if (this.props.conf.id != nextProps.conf.id) {
+                this.setState({
+                    name: nextProps.conf.name,
+                    value: nextProps.conf.value
+                });
+            }
+        };
         EditPane.prototype.render = function () {
             var _this = this;
-            return (React.createElement("div", null,
+            return (React.createElement("div", { id: "input_pane" },
                 React.createElement("table", null,
                     React.createElement("tbody", null,
                         React.createElement("tr", null,
-                            React.createElement("td", null,
+                            React.createElement("td", { id: "label" },
                                 React.createElement("label", null, "\u30AD\u30FC")),
-                            React.createElement("td", null,
+                            React.createElement("td", { id: "value" },
                                 React.createElement("input", { type: "text", value: this.state.name, onChange: function (e) { return _this.setState({ name: e.target.value }); } }))),
                         React.createElement("tr", null,
-                            React.createElement("td", null,
+                            React.createElement("td", { id: "label" },
                                 React.createElement("label", null, "\u5024")),
-                            React.createElement("td", null,
+                            React.createElement("td", { id: "value" },
                                 React.createElement("textarea", { value: this.state.value, onChange: function (e) { return _this.setState({ value: e.target.value }); } }))))),
-                React.createElement("div", null,
+                React.createElement("div", { id: "button_area" },
                     React.createElement("button", { onClick: function () { return _this.toCancel(); } }, "\u30AD\u30E3\u30F3\u30BB\u30EB"),
                     React.createElement("button", { onClick: function () { return _this.toDelete(); } }, "\u524A\u9664"),
                     React.createElement("button", { onClick: function () { return _this.toSave(); } }, "\u4FDD\u5B58"))));
@@ -898,29 +907,31 @@ var ConfigMgr = /** @class */ (function (_super) {
             }
         };
         if (this.state.configurations) {
-            return (React.createElement("div", null,
-                React.createElement("div", null,
+            return (React.createElement("div", { id: "confmgr" },
+                React.createElement("h1", null, "\u8A2D\u5B9A\u5024\u7BA1\u7406"),
+                React.createElement("hr", null),
+                React.createElement("div", { id: "button_area" },
                     React.createElement("button", { onClick: function () { return _this.toMenu(); } }, "\u30E1\u30CB\u30E5\u30FC\u3078"),
                     React.createElement("button", { onClick: function () { return _this.toCreate(); } }, "\u65B0\u898F\u8A2D\u5B9A\u5024"),
                     React.createElement("button", { onClick: function () { return _this.doRefresh(); } }, "\u518D\u53D6\u5F97")),
-                React.createElement("table", null,
+                React.createElement("table", { id: "main_area" },
                     React.createElement("tbody", null,
                         React.createElement("tr", null,
-                            React.createElement("td", null,
+                            React.createElement("td", { id: "list_pane" },
                                 React.createElement("table", null,
                                     React.createElement("tbody", null,
-                                        React.createElement("tr", null,
-                                            React.createElement("td", null, "\u9078\u629E"),
-                                            React.createElement("td", null, "\u30AD\u30FC"),
-                                            React.createElement("td", null, "\u5024")),
+                                        React.createElement("tr", { id: "title" },
+                                            React.createElement("td", { id: "select_column" }, "\u9078\u629E"),
+                                            React.createElement("td", { id: "key_column" }, "\u30AD\u30FC"),
+                                            React.createElement("td", { id: "value_column" }, "\u5024")),
                                         this.state.configurations.map(function (conf) {
                                             return (React.createElement("tr", { key: conf.id },
-                                                React.createElement("td", null,
+                                                React.createElement("td", { id: "select_column" },
                                                     React.createElement("input", { type: "radio", checked: (self.state.current && self.state.current.id == conf.id) ? true : false, value: conf.id, onClick: function () { return self.toSelect(conf); } })),
-                                                React.createElement("td", null, conf.name),
-                                                React.createElement("td", null, conf.value)));
+                                                React.createElement("td", { id: "key_column" }, conf.name),
+                                                React.createElement("td", { id: "value_column" }, conf.value)));
                                         })))),
-                            React.createElement("td", null, SwithByAction(this.state.action)))))));
+                            React.createElement("td", { id: "detail_pane" }, SwithByAction(this.state.action)))))));
         }
         else {
             return React.createElement("h1", null, "Loading ..................................");
@@ -988,82 +999,96 @@ var HistMgr = /** @class */ (function (_super) {
     HistMgr.prototype.doDelete = function (hist) {
         var _this = this;
         var h = this.state.historyList.get(hist.id);
-        this.state.historyList.remove(h);
-        h.destroy({ success: function () { return _this.refresh(); } });
+        var self = this;
+        h.destroy({ success: function () {
+                _this.setState({ currentHistory: null });
+                _this.refresh();
+            } });
+    };
+    HistMgr.prototype.toSelect = function (hist) {
+        this.setState({ currentHistory: hist });
     };
     HistMgr.prototype.render = function () {
         var _this = this;
         var self = this;
         if (this.state.client && this.state.user && this.state.api && this.state.historyList) {
-            return (React.createElement("div", null,
+            return (React.createElement("div", { id: "histmgr" },
                 React.createElement("h1", null, "\u547C\u51FA\u5C65\u6B74\u30E1\u30F3\u30C6\u30CA\u30F3\u30B9"),
-                React.createElement("table", null,
+                React.createElement("hr", null),
+                React.createElement("div", { id: "button_area" },
+                    React.createElement("button", { onClick: function () { return _this.props.history.goBack(); } }, "API\u30E1\u30F3\u30C6\u3078"),
+                    React.createElement("button", { onClick: function () { return self.refresh(); } }, "\u518D\u53D6\u5F97")),
+                React.createElement("div", { id: "description" },
+                    React.createElement("label", null, "\u30AF\u30E9\u30A4\u30A2\u30F3\u30C8"),
+                    React.createElement("input", { type: "text", readOnly: true, value: this.state.client.clientName + "(" + this.state.client.clientKey + ")" })),
+                React.createElement("div", { id: "description" },
+                    React.createElement("label", null, "\u30E6\u30FC\u30B6"),
+                    React.createElement("input", { type: "text", readOnly: true, value: this.state.user.userName + "(" + this.state.user.userID + ")" })),
+                React.createElement("div", { id: "description" },
+                    React.createElement("label", null, "API"),
+                    React.createElement("input", { type: "text", readOnly: true, value: this.state.api.apiName + "(" + this.state.api.apiPath + ")" })),
+                React.createElement("table", { id: "main_area" },
                     React.createElement("tbody", null,
                         React.createElement("tr", null,
-                            React.createElement("td", null,
-                                React.createElement("button", { onClick: function () { return _this.props.history.goBack(); } }, "API\u30E1\u30F3\u30C6\u3078"))))),
-                React.createElement("table", null,
-                    React.createElement("tbody", null,
-                        React.createElement("tr", null,
-                            React.createElement("td", null,
-                                React.createElement("label", null, "\u30AF\u30E9\u30A4\u30A2\u30F3\u30C8")),
-                            React.createElement("td", null,
-                                React.createElement("input", { type: "text", readOnly: true, value: this.state.client.clientName + "(" + this.state.client.clientKey + ")" }))),
-                        React.createElement("tr", null,
-                            React.createElement("td", null,
-                                React.createElement("label", null, "\u30E6\u30FC\u30B6")),
-                            React.createElement("td", null,
-                                React.createElement("input", { type: "text", readOnly: true, value: this.state.user.userName + "(" + this.state.user.userID + ")" }))),
-                        React.createElement("tr", null,
-                            React.createElement("td", null,
-                                React.createElement("label", null, "API")),
-                            React.createElement("td", null,
-                                React.createElement("input", { type: "text", readOnly: true, value: this.state.api.apiName + "(" + this.state.api.apiPath + ")" }))))),
-                React.createElement("table", null,
-                    React.createElement("tbody", null,
-                        React.createElement("tr", null,
-                            React.createElement("td", null,
+                            React.createElement("td", { id: "list_pane" },
                                 React.createElement("table", null,
                                     React.createElement("tbody", null,
-                                        React.createElement("tr", null,
-                                            React.createElement("td", null, "\u9078\u629E"),
-                                            React.createElement("td", null, "\u6642\u523B"),
-                                            React.createElement("td", null, "\u30B9\u30C6\u30FC\u30BF\u30B9")),
+                                        React.createElement("tr", { id: "title" },
+                                            React.createElement("td", { id: "select_column" }, "\u9078\u629E"),
+                                            React.createElement("td", { id: "ts_column" }, "\u6642\u523B"),
+                                            React.createElement("td", { id: "status_column" }, "\u30B9\u30C6\u30FC\u30BF\u30B9")),
                                         this.state.historyList.map(function (h) {
                                             var dt = new Date(h.accessTime);
                                             var curr = self.state.currentHistory;
                                             var id = curr && curr.id;
                                             return (React.createElement("tr", { key: h.id },
-                                                React.createElement("td", null,
-                                                    React.createElement("input", { type: "radio", checked: id == h.id, value: h.id })),
-                                                React.createElement("td", null, dt.toLocaleDateString()),
-                                                React.createElement("td", null, function (h) {
+                                                React.createElement("td", { id: "select_column" },
+                                                    React.createElement("input", { type: "radio", checked: id == h.id, value: h.id, onClick: function () { return self.toSelect(h); } })),
+                                                React.createElement("td", { id: "ts_column" }, dt.toLocaleTimeString()),
+                                                React.createElement("td", { id: "status_column" }, function (h) {
                                                     var resp = JSON.parse(h.responseJson);
                                                     return React.createElement("span", null, resp.status);
                                                 }(h))));
                                         })))),
-                            React.createElement("td", null, self.state.currentHistory && function (h) {
+                            React.createElement("td", { id: "detail_pane" }, self.state.currentHistory && function (h) {
                                 var dat = new Date(h.accessTime);
+                                var req = JSON.parse(h.requestJson);
+                                var res = JSON.parse(h.responseJson);
                                 return (React.createElement("div", null,
                                     React.createElement("h1", null, "\u8A73\u7D30"),
-                                    React.createElement("table", null,
+                                    React.createElement("hr", null),
+                                    React.createElement("table", { id: "input_pane" },
                                         React.createElement("tbody", null,
                                             React.createElement("tr", null,
-                                                React.createElement("td", null,
-                                                    React.createElement("label", null, "\u6642\u523B")),
-                                                React.createElement("td", null,
-                                                    React.createElement("input", { readOnly: true, value: dat.toDateString() }))),
+                                                React.createElement("td", { colSpan: 2, id: "label" }, "\u6642\u523B"),
+                                                React.createElement("td", { id: "value" }, dat.toLocaleTimeString())),
                                             React.createElement("tr", null,
-                                                React.createElement("td", null,
-                                                    React.createElement("label", null, "\u30EA\u30AF\u30A8\u30B9\u30C8")),
-                                                React.createElement("td", null,
-                                                    React.createElement("textarea", { readOnly: true, value: h.requestJson }))),
+                                                React.createElement("td", { rowSpan: 3, id: "dlabel" }, "\u30EA\u30AF\u30A8\u30B9\u30C8"),
+                                                React.createElement("td", { id: "label" }, "\u30E1\u30BD\u30C3\u30C9"),
+                                                React.createElement("td", { id: "value" },
+                                                    React.createElement("input", { type: "text", value: req.method }))),
                                             React.createElement("tr", null,
-                                                React.createElement("td", null,
-                                                    React.createElement("label", null, "\u30EC\u30B9\u30DD\u30F3\u30B9")),
-                                                React.createElement("td", null,
-                                                    React.createElement("textarea", { readOnly: true, value: h.responseJson }))))),
-                                    React.createElement("div", null,
+                                                React.createElement("td", { id: "label" }, "\u30D8\u30C3\u30C0\u30FC"),
+                                                React.createElement("td", { id: "value" },
+                                                    React.createElement("textarea", { value: req.headers.map(function (e) { return e.name + ": " + e.value; }).join("\n") }))),
+                                            React.createElement("tr", null,
+                                                React.createElement("td", { id: "label" }, "\u30DC\u30C7\u30A3\u30FC"),
+                                                React.createElement("td", { id: "value" },
+                                                    React.createElement("textarea", { value: req.body }))),
+                                            React.createElement("tr", null,
+                                                React.createElement("td", { rowSpan: 3, id: "dlabel" }, "\u30EC\u30B9\u30DD\u30F3\u30B9"),
+                                                React.createElement("td", { id: "label" }, "\u30B9\u30C6\u30FC\u30BF\u30B9"),
+                                                React.createElement("td", { id: "value" },
+                                                    React.createElement("input", { type: "text", value: res.status }))),
+                                            React.createElement("tr", null,
+                                                React.createElement("td", { id: "label" }, "\u30D8\u30C3\u30C0\u30FC"),
+                                                React.createElement("td", { id: "value" },
+                                                    React.createElement("textarea", { value: res.headers.map(function (e) { return e.name + ": " + e.value; }).join("\n") }))),
+                                            React.createElement("tr", null,
+                                                React.createElement("td", { id: "label" }, "\u30DC\u30C7\u30A3\u30FC"),
+                                                React.createElement("td", { id: "value" },
+                                                    React.createElement("textarea", { value: res.body }))))),
+                                    React.createElement("div", { id: "button_area" },
                                         React.createElement("button", { onClick: function () { return self.doDelete(self.state.currentHistory); } }, "\u524A\u9664"))));
                             }(self.state.currentHistory) || React.createElement("div", null)))))));
         }
@@ -1164,22 +1189,32 @@ var UserEditor = /** @class */ (function (_super) {
     };
     UserEditor.prototype.render = function () {
         var _this = this;
-        return (React.createElement("div", null,
+        return (React.createElement("div", { id: "detail_pane" },
             React.createElement("h2", null, "\u30E6\u30FC\u30B6\u7DE8\u96C6"),
-            React.createElement("div", null,
-                React.createElement("label", null, "\u30E6\u30FC\u30B6ID"),
-                React.createElement("input", { type: "text", value: this.state.userID, onChange: function (e) { return _this.setState({ userID: e.target.value }); } })),
-            React.createElement("div", null,
-                React.createElement("label", null, "\u30E6\u30FC\u30B6\u540D"),
-                React.createElement("input", { type: "text", value: this.state.userName, onChange: function (e) { return _this.setState({ userName: e.target.value }); } })),
-            React.createElement("div", null,
-                React.createElement("label", null, "\u30D1\u30B9\u30EF\u30FC\u30C9"),
-                React.createElement("input", { type: "password", value: this.state.password, onChange: function (e) { return _this.setState({ password: e.target.value }); } })),
-            React.createElement("div", null,
-                React.createElement("button", { onClick: function () { return _this.clearHist(); } }, "\u5C65\u6B74\u30AF\u30EA\u30A2"),
-                React.createElement("button", { onClick: function () { return _this.remove(); } }, "\u524A\u9664"),
-                React.createElement("button", { onClick: function () { return _this.update(); } }, "\u4FDD\u5B58"),
-                React.createElement("button", { onClick: this.props.onCancel }, "\u30AD\u30E3\u30F3\u30BB\u30EB"))));
+            React.createElement("hr", null),
+            React.createElement("table", { id: "input_pane" },
+                React.createElement("tbody", null,
+                    React.createElement("tr", null,
+                        React.createElement("td", { id: "label" },
+                            React.createElement("label", null, "\u30E6\u30FC\u30B6ID")),
+                        React.createElement("td", { id: "value" },
+                            React.createElement("input", { type: "text", value: this.state.userID, onChange: function (e) { return _this.setState({ userID: e.target.value }); } }))),
+                    React.createElement("tr", null,
+                        React.createElement("td", { id: "label" },
+                            React.createElement("label", null, "\u30E6\u30FC\u30B6\u540D")),
+                        React.createElement("td", { id: "value" },
+                            React.createElement("input", { type: "text", value: this.state.userName, onChange: function (e) { return _this.setState({ userName: e.target.value }); } }))),
+                    React.createElement("tr", null,
+                        React.createElement("td", { id: "label" },
+                            React.createElement("label", null, "\u30D1\u30B9\u30EF\u30FC\u30C9")),
+                        React.createElement("td", { id: "value" },
+                            React.createElement("input", { type: "password", value: this.state.password, onChange: function (e) { return _this.setState({ password: e.target.value }); } }))),
+                    React.createElement("tr", null,
+                        React.createElement("td", { colSpan: 2, id: "button_area" },
+                            React.createElement("button", { onClick: function () { return _this.clearHist(); } }, "\u5C65\u6B74\u30AF\u30EA\u30A2"),
+                            React.createElement("button", { onClick: function () { return _this.remove(); } }, "\u524A\u9664"),
+                            React.createElement("button", { onClick: function () { return _this.update(); } }, "\u4FDD\u5B58"),
+                            React.createElement("button", { onClick: this.props.onCancel }, "\u30AD\u30E3\u30F3\u30BB\u30EB")))))));
     };
     return UserEditor;
 }(React.Component));
@@ -1216,18 +1251,18 @@ var UserList = /** @class */ (function (_super) {
             return (React.createElement("div", null,
                 React.createElement("table", null,
                     React.createElement("tbody", null,
-                        React.createElement("tr", null,
-                            React.createElement("td", null, "\u9078\u629E"),
-                            React.createElement("td", null, "\u30E6\u30FC\u30B6ID"),
-                            React.createElement("td", null, "\u30E6\u30FC\u30B6\u540D"),
-                            React.createElement("td", null, "API")),
+                        React.createElement("tr", { id: "title" },
+                            React.createElement("td", { id: "select_column" }, "\u9078\u629E"),
+                            React.createElement("td", { id: "userid_column" }, "\u30E6\u30FC\u30B6ID"),
+                            React.createElement("td", { id: "username_column" }, "\u30E6\u30FC\u30B6\u540D"),
+                            React.createElement("td", { id: "sub_column" }, "API")),
                         this.props.users.models.map(function (u) {
                             return (React.createElement("tr", { key: u.userID },
-                                React.createElement("td", null,
+                                React.createElement("td", { id: "select_column" },
                                     React.createElement("input", { type: "radio", name: "selectUser", value: u.userID, onClick: function () { return self.selectUser(u); }, checked: u.userID == self.state.checkedUserID, onChange: function (e) { return self.setState({ checkedUserID: e.target.value }); } })),
-                                React.createElement("td", null, u.userID),
-                                React.createElement("td", null, u.userName),
-                                React.createElement("td", null,
+                                React.createElement("td", { id: "userid_column" }, u.userID),
+                                React.createElement("td", { id: "username_column" }, u.userName),
+                                React.createElement("td", { id: "sub_column" },
                                     React.createElement("button", { onClick: function () { return self.showApis(u); } }, "\uFF1E\uFF1E"))));
                         })))));
         }
@@ -1312,39 +1347,50 @@ var UserMgr = /** @class */ (function (_super) {
             var identify = "";
             var name = "";
             var password = "";
-            return (React.createElement("div", null,
+            return (React.createElement("div", { id: "detail_pane" },
                 React.createElement("h2", null, "\u30E6\u30FC\u30B6\u7DE8\u96C6"),
-                React.createElement("div", null,
-                    React.createElement("label", null, "\u30E6\u30FC\u30B6ID"),
-                    React.createElement("input", { type: "text", onChange: function (e) { return identify = e.target.value; } })),
-                React.createElement("div", null,
-                    React.createElement("label", null, "\u30E6\u30FC\u30B6\u540D"),
-                    React.createElement("input", { type: "text", onChange: function (e) { return name = e.target.value; } })),
-                React.createElement("div", null,
-                    React.createElement("label", null, "\u30D1\u30B9\u30EF\u30FC\u30C9"),
-                    React.createElement("input", { type: "password", onChange: function (e) { return password = e.target.value; } })),
-                React.createElement("div", null,
-                    React.createElement("button", { onClick: function () { return props.onCancel(); } }, "\u30AD\u30E3\u30F3\u30BB\u30EB"),
-                    React.createElement("button", { onClick: function () { return props.onSave(identify, name, password); } }, "\u4FDD\u5B58"))));
-        };
-        if (this.state.client && this.state.users) {
-            return (React.createElement("div", null,
-                React.createElement("h1", null, "\u30E6\u30FC\u30B6\u30E1\u30F3\u30C6\u30CA\u30F3\u30B9"),
-                React.createElement("div", null,
-                    React.createElement("button", { onClick: function () { return _this.props.history.goBack(); } }, "\u30E1\u30CB\u30E5\u30FC\u3078")),
-                React.createElement("div", null,
-                    React.createElement("label", null, "\u30AF\u30E9\u30A4\u30A2\u30F3\u30C8"),
-                    React.createElement("input", { type: "text", readOnly: true, value: this.state.client }),
-                    React.createElement("button", { type: "button", onClick: function () { return _this.logout(); } }, "\u30ED\u30B0\u30A2\u30A6\u30C8"),
-                    React.createElement("button", { type: "button", onClick: function () { return _this.clearAllHistory(); } }, "\u5168\u5C65\u6B74\u30AF\u30EA\u30A2")),
-                React.createElement("table", null,
+                React.createElement("hr", null),
+                React.createElement("table", { id: "input_pane" },
                     React.createElement("tbody", null,
                         React.createElement("tr", null,
-                            React.createElement("td", null,
-                                React.createElement("div", null,
-                                    React.createElement("button", { type: "button", onClick: function () { return _this.newUser(); } }, "\u8FFD\u52A0"),
-                                    React.createElement("button", { type: "button", onClick: function () { return _this.refreshUserList(); } }, "\u518D\u53D6\u5F97"),
-                                    React.createElement(UserList, { users: this.state.users, onSelect: function (u) { return _this.selectUser(u); }, onShowAPI: function (u) { return _this.showApi(u); } }))),
+                            React.createElement("td", { id: "label" },
+                                React.createElement("label", null, "\u30E6\u30FC\u30B6ID")),
+                            React.createElement("td", { id: "value" },
+                                React.createElement("input", { type: "text", onChange: function (e) { return identify = e.target.value; } }))),
+                        React.createElement("tr", null,
+                            React.createElement("td", { id: "label" },
+                                React.createElement("label", null, "\u30E6\u30FC\u30B6\u540D")),
+                            React.createElement("td", { id: "value" },
+                                React.createElement("input", { type: "text", onChange: function (e) { return name = e.target.value; } }))),
+                        React.createElement("tr", null,
+                            React.createElement("td", { id: "label" },
+                                React.createElement("label", null, "\u30D1\u30B9\u30EF\u30FC\u30C9")),
+                            React.createElement("td", { id: "value" },
+                                React.createElement("input", { type: "password", onChange: function (e) { return password = e.target.value; } }))),
+                        React.createElement("tr", null,
+                            React.createElement("td", { colSpan: 2, id: "button_area" },
+                                React.createElement("button", { onClick: function () { return props.onCancel(); } }, "\u30AD\u30E3\u30F3\u30BB\u30EB"),
+                                React.createElement("button", { onClick: function () { return props.onSave(identify, name, password); } }, "\u4FDD\u5B58")))))));
+        };
+        if (this.state.client && this.state.users) {
+            return (React.createElement("div", { id: "usermgr" },
+                React.createElement("h1", null, "\u30E6\u30FC\u30B6\u30E1\u30F3\u30C6\u30CA\u30F3\u30B9"),
+                React.createElement("hr", null),
+                React.createElement("div", { id: "button_area" },
+                    React.createElement("button", { onClick: function () { return _this.props.history.goBack(); } }, "\u30E1\u30CB\u30E5\u30FC\u3078"),
+                    React.createElement("button", { type: "button", onClick: function () { return _this.newUser(); } }, "\u8FFD\u52A0"),
+                    React.createElement("button", { type: "button", onClick: function () { return _this.refreshUserList(); } }, "\u518D\u53D6\u5F97"),
+                    React.createElement("button", { onClick: function () { return _this.clearAllHistory(); } }, "\u5168\u5C65\u6B74\u30AF\u30EA\u30A2"),
+                    React.createElement("button", { onClick: function () { return _this.logout(); } }, "\u30ED\u30B0\u30A2\u30A6\u30C8")),
+                React.createElement("div", { id: "description" },
+                    React.createElement("div", null,
+                        React.createElement("label", null, "\u30AF\u30E9\u30A4\u30A2\u30F3\u30C8"),
+                        React.createElement("input", { type: "text", readOnly: true, value: this.state.client }))),
+                React.createElement("table", { id: "main_area" },
+                    React.createElement("tbody", null,
+                        React.createElement("tr", null,
+                            React.createElement("td", { id: "list_pane" },
+                                React.createElement(UserList, { users: this.state.users, onSelect: function (u) { return _this.selectUser(u); }, onShowAPI: function (u) { return _this.showApi(u); } })),
                             React.createElement("td", null,
                                 React.createElement("div", null, this.state.action == UserMgrAction.NONE ?
                                     React.createElement("div", null)

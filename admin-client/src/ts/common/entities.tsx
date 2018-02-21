@@ -60,7 +60,7 @@ export class ClientModel extends Backbone.Model {
 export interface Api {
   apiPath: string
   apiName: string
-  conditionJson: string
+  conditionJs: string
   responseJson: string
 }
 
@@ -85,12 +85,12 @@ export class ApiModel extends Backbone.Model implements Api {
     this.set('apiName', v)
   }
 
-  get conditionJson(): string {
-    return this.get('conditionJson')
+  get conditionJs(): string {
+    return this.get('conditionJs')
   }
 
-  set conditionJson(v: string) {
-    this.set('conditionJson', v)
+  set conditionJs(v: string) {
+    this.set('conditionJs', v)
   }
 
   get responseJson(): string {

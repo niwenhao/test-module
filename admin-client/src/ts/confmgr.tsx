@@ -29,18 +29,18 @@ namespace create {
     }
     render() {
       return (
-        <div>
+        <div id="input_pane">
           <table><tbody>
             <tr>
-              <td><label>キー</label></td>
-              <td><input type="text" value={this.state.name} onChange={(e) => this.setState({name: e.target.value})}/></td>
+              <td id="label"><label>キー</label></td>
+              <td id="value"><input type="text" value={this.state.name} onChange={(e) => this.setState({name: e.target.value})}/></td>
             </tr>
             <tr>
-              <td><label>値</label></td>
-              <td><textarea value={this.state.value} onChange={(e) => this.setState({value: e.target.value})}/></td>
+              <td id="label"><label>値</label></td>
+              <td id="value"><textarea value={this.state.value} onChange={(e) => this.setState({value: e.target.value})}/></td>
             </tr>
           </tbody></table>
-          <div>
+          <div id="button_area">
             <button onClick={() => this.toCancel()}>キャンセル</button>
             <button onClick={() => this.toSave()}>保存</button>
           </div>
@@ -86,20 +86,29 @@ namespace edit {
       this.props.onSave(c)
     }
 
+    componentWillReceiveProps(nextProps: EditProps, nextContext: any) {
+      if (this.props.conf.id != nextProps.conf.id) {
+        this.setState({
+          name: nextProps.conf.name,
+          value: nextProps.conf.value
+        })
+      }
+    }
+
     render() {
       return (
-        <div>
+        <div id="input_pane">
           <table><tbody>
             <tr>
-              <td><label>キー</label></td>
-              <td><input type="text" value={this.state.name} onChange={(e) => this.setState({name: e.target.value})}/></td>
+              <td id="label"><label>キー</label></td>
+              <td id="value"><input type="text" value={this.state.name} onChange={(e) => this.setState({name: e.target.value})}/></td>
             </tr>
             <tr>
-              <td><label>値</label></td>
-              <td><textarea value={this.state.value} onChange={(e) => this.setState({value: e.target.value})}/></td>
+              <td id="label"><label>値</label></td>
+              <td id="value"><textarea value={this.state.value} onChange={(e) => this.setState({value: e.target.value})}/></td>
             </tr>
           </tbody></table>
-          <div>
+          <div id="button_area">
             <button onClick={() => this.toCancel()}>キャンセル</button>
             <button onClick={() => this.toDelete()}>削除</button>
             <button onClick={() => this.toSave()}>保存</button>
@@ -205,33 +214,35 @@ export class ConfigMgr extends React.Component<RouteComponentProps<any>, ConfigM
     }
     if (this.state.configurations) {
       return (
-        <div>
-          <div>
+        <div id="confmgr">
+          <h1>設定値管理</h1>
+          <hr/>
+          <div id="button_area">
             <button onClick={()=>this.toMenu()}>メニューへ</button>
             <button onClick={()=>this.toCreate()}>新規設定値</button>
             <button onClick={()=>this.doRefresh()}>再取得</button>
           </div>
-          <table><tbody><tr>
-            <td>
+          <table id="main_area"><tbody><tr>
+            <td id="list_pane">
               <table><tbody>
-                <tr>
-                  <td>選択</td>
-                  <td>キー</td>
-                  <td>値</td>
+                <tr id="title">
+                  <td id="select_column">選択</td>
+                  <td id="key_column">キー</td>
+                  <td id="value_column">値</td>
                 </tr>
                 {this.state.configurations.map(function(conf) {
                   return (
                   <tr key={conf.id}>
-                    <td><input type="radio" checked={(self.state.current && self.state.current.id == conf.id)?true:false} 
+                    <td id="select_column"><input type="radio" checked={(self.state.current && self.state.current.id == conf.id)?true:false} 
                                value={conf.id} onClick={() => self.toSelect(conf)}/></td>
-                    <td>{conf.name}</td>
-                    <td>{conf.value}</td>
+                    <td id="key_column">{conf.name}</td>
+                    <td id="value_column">{conf.value}</td>
                   </tr>
                   )
                 })}
               </tbody></table>
             </td>
-            <td>
+            <td id="detail_pane">
             {SwithByAction(this.state.action)}
             </td>
           </tr></tbody></table>

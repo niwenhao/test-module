@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "deploy": "gulp && browserify midjs/main.js -o ../src/main/resources/static/admin.js && cd .. && gradle build"
+    "deploy": "gulp && browserify midjs/main.js -o ../src/main/resources/static/admin.js && lessc src/css/styles.less > ../src/main/resources/static/styles.css && cd .. && gradle build"
   },
   "author": "",
   "license": "ISC",
@@ -25,6 +25,7 @@
     "@types/react-router-dom": "^4.2.3",
     "gulp": "^3.9.1",
     "gulp-typescript": "^3.2.4",
+    "less": "^3.0.1",
     "typescript": "^2.7.1"
   }
 }

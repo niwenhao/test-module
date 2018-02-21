@@ -60,52 +60,75 @@ export class HistMgr extends React.Component<RouteComponentProps<any>, HistMgrSt
 
   doDelete(hist: HistoryModel) {
     let h = this.state.historyList!.get(hist.id)
-    this.state.historyList!.remove(h)
-    h.destroy({ success: () => this.refresh()})
+    let self = this
+    h.destroy({ success: () => {
+      this.setState({currentHistory: null})
+      this.refresh()
+    }})
+  }
+
+  toSelect(hist: HistoryModel) {
+    this.setState({currentHistory: hist})
   }
 
   render(): React.ReactNode {
     let self = this
+
+    type DetailProps = {
+      history: HistoryModel, 
+      onDelete: (h: HistoryModel) => void
+    }
+
+    type RequestData = {
+      method: string, 
+      headers: { 
+        name: string, 
+        value: string
+      }[],
+      body: string
+    }
+    type ResponseData = {
+      status: number,
+      headers: {
+        name: string,
+        value: string
+      }[],
+      body: string
+    }
+
     if (this.state.client && this.state.user && this.state.api && this.state.historyList) {
       return (
-        <div>
+        <div id="histmgr">
           <h1>呼出履歴メンテナンス</h1>
-          <table>
-            <tbody>
-              <tr>
-                <td><button onClick={() => this.props.history.goBack()}>APIメンテへ</button></td>
-              </tr>
-            </tbody>
-          </table>
-          <table><tbody>
-            <tr><td>
+          <hr/>
+          <div id="button_area">
+            <button onClick={() => this.props.history.goBack()}>APIメンテへ</button>
+            <button onClick={() => self.refresh()}>再取得</button>
+          </div>
+          <div id="description">
               <label>クライアント</label>
-            </td><td>
               <input type="text" readOnly={true} 
-                value={`${this.state.client!.clientName}(${this.state.client!.clientKey})`}/>
-            </td></tr>
-            <tr><td>
+                value={`${this.state.client!.clientName}(${this.state.client!.clientKey})`} />
+          </div>
+          <div id="description">
               <label>ユーザ</label>
-            </td><td>
               <input type="text" readOnly={true} 
                 value={`${this.state.user!.userName}(${this.state.user!.userID})`}/>
-            </td></tr>
-            <tr><td>
+          </div>
+          <div id="description">
               <label>API</label>
-            </td><td>
               <input type="text" readOnly={true} 
                 value={`${this.state.api!.apiName}(${this.state.api!.apiPath})`}/>
-            </td></tr>
-          </tbody></table>
-          <table>
+          </div>
+          <table id="main_area">
             <tbody>
               <tr>
-                <td>
+                <td id="list_pane">
                   <table><tbody>
-                    <tr>
-                      <td>選択</td>
-                      <td>時刻</td>
-                      <td>ステータス</td>
+                    <tr id="title">
+                      <td id="select_column">選択</td>
+                      <td id="ts_column">時刻</td>
+                      <td id="status_column">ステータス</td>
                     </tr>
                     {this.state.historyList!.map(function(h: HistoryModel) {
                       let dt = new Date(h.accessTime)
@@ -113,11 +136,11 @@ export class HistMgr extends React.Component<RouteComponentProps<any>, HistMgrSt
                       let id = curr && curr.id
                       return (
                         <tr key={h.id}>
-                          <td>
-                            <input type="radio" checked={id == h.id} value={h.id}/>
+                          <td id="select_column">
+                            <input type="radio" checked={id == h.id} value={h.id} onClick={() => self.toSelect(h)}/>
                           </td>
-                          <td>{dt.toLocaleDateString()}</td>
-                          <td>{function(h:HistoryModel){
+                          <td id="ts_column">{dt.toLocaleTimeString()}</td>
+                          <td id="status_column">{function(h:HistoryModel){
                             let resp = JSON.parse(h.responseJson)
                             return <span>{resp.status}</span>
                             }(h)}</td>
@@ -126,28 +149,49 @@ export class HistMgr extends React.Component<RouteComponentProps<any>, HistMgrSt
                     })}
                   </tbody></table>
                 </td>
-                <td>
+                <td id="detail_pane">
                   {self.state.currentHistory && function(h: HistoryModel) {
                     let dat = new Date(h.accessTime)
+                    let req = JSON.parse(h.requestJson) as RequestData
+                    let res = JSON.parse(h.responseJson) as ResponseData
 
                     return (
                       <div>
                         <h1>詳細</h1>
-                        <table><tbody>
+                        <hr/>
+                        <table id="input_pane"><tbody>
                           <tr>
-                            <td><label>時刻</label></td>
-                            <td><input readOnly={true} value={dat.toDateString()}/></td>
+                            <td colSpan={2} id="label">時刻</td>
+                            <td id="value">{dat.toLocaleTimeString()}</td>
                           </tr>
                           <tr>
-                            <td><label>リクエスト</label></td>
-                            <td><textarea readOnly={true} value={h.requestJson}/></td>
+                            <td rowSpan={3} id="dlabel">リクエスト</td>
+                            <td id="label">メソッド</td>
+                            <td id="value"><input type="text" value={req.method}/></td>
                           </tr>
                           <tr>
-                            <td><label>レスポンス</label></td>
-                            <td><textarea readOnly={true} value={h.responseJson}/></td>
+                            <td id="label">ヘッダー</td>
+                            <td id="value"><textarea value={req.headers.map((e) => `${e.name}: ${e.value}`).join("\n")}/></td>
+                          </tr>
+                          <tr>
+                            <td id="label">ボディー</td>
+                            <td id="value"><textarea value={req.body}/></td>
+                          </tr>
+                          <tr>
+                            <td rowSpan={3} id="dlabel">レスポンス</td>
+                            <td id="label">ステータス</td>
+                            <td id="value"><input type="text" value={res.status}/></td>
+                          </tr>
+                          <tr>
+                            <td id="label">ヘッダー</td>
+                            <td id="value"><textarea value={res.headers.map((e) => `${e.name}: ${e.value}`).join("\n")}/></td>
+                          </tr>
+                          <tr>
+                            <td id="label">ボディー</td>
+                            <td id="value"><textarea value={res.body}/></td>
                           </tr>
                         </tbody></table>
-                        <div>
+                        <div id="button_area">
                           <button onClick={() => self.doDelete(self.state.currentHistory!)}>削除</button>
                         </div>
                       </div>

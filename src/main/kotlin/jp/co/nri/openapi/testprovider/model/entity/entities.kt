@@ -63,13 +63,13 @@ data class ProviderApi(
 data class ProviderApiHist(
         @Id
         @GeneratedValue
-        var id: Long?,
+        var id: Long? = null,
         @ManyToOne
-        var api: ProviderApi?,
+        var api: ProviderApi? = null,
         @Column
-        var accessTime: Long?,
+        var accessTime: Long? = null,
         @Column(length=512*1024, columnDefinition = "LONG")
-        var requestJson: String?,
+        var requestJson: String? = null,
         @Column(length=512*1024, columnDefinition = "LONG")
-        var responseJson: String?
+        var responseJson: String? = null
 )

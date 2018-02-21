@@ -57,26 +57,29 @@ class UserEditor extends React.Component<UserEditorProps, UserEditorState> {
 
   render(): React.ReactNode {
     return (
-      <div>
+      <div id="detail_pane">
         <h2>ユーザ編集</h2>
-        <div>
-          <label>ユーザID</label>
-          <input type="text" value={this.state.userID} onChange = {(e:any) => this.setState({userID: e.target.value})} />
-        </div>
-        <div>
-          <label>ユーザ名</label>
-          <input type="text" value={this.state.userName} onChange = {(e:any) => this.setState({userName: e.target.value})} />
-        </div>
-        <div>
-          <label>パスワード</label>
-          <input type="password" value={this.state.password} onChange = {(e:any) => this.setState({password: e.target.value})} />
-        </div>
-        <div>
-          <button onClick={() => this.clearHist()}>履歴クリア</button>
-          <button onClick={() => this.remove()}>削除</button>
-          <button onClick={() => this.update()}>保存</button>
-          <button onClick={this.props.onCancel}>キャンセル</button>
-        </div>
+        <hr/>
+        <table id="input_pane"><tbody>
+          <tr>
+            <td id="label"><label>ユーザID</label></td>
+            <td id="value"><input type="text" value={this.state.userID} onChange = {(e:any) => this.setState({userID: e.target.value})} /></td>
+          </tr>
+          <tr>
+            <td id="label"><label>ユーザ名</label></td>
+            <td id="value"><input type="text" value={this.state.userName} onChange = {(e:any) => this.setState({userName: e.target.value})} /></td>
+          </tr>
+          <tr>
+            <td id="label"><label>パスワード</label></td>
+            <td id="value"><input type="password" value={this.state.password} onChange = {(e:any) => this.setState({password: e.target.value})} /></td>
+          </tr>
+          <tr><td colSpan={2} id="button_area">
+            <button onClick={() => this.clearHist()}>履歴クリア</button>
+            <button onClick={() => this.remove()}>削除</button>
+            <button onClick={() => this.update()}>保存</button>
+            <button onClick={this.props.onCancel}>キャンセル</button>
+          </td></tr>
+        </tbody></table>
       </div>
     )
   }
@@ -136,25 +139,25 @@ class UserList extends React.Component<UserListProps, UserListState>
         <div>
           <table>
             <tbody>
-              <tr>
-                <td>選択</td>
-                <td>ユーザID</td>
-                <td>ユーザ名</td>
-                <td>API</td>
+              <tr id="title">
+                <td id="select_column">選択</td>
+                <td id="userid_column">ユーザID</td>
+                <td id="username_column">ユーザ名</td>
+                <td id="sub_column">API</td>
               </tr>
               { this.props.users!.models.map(
                   function(u:UserModel): React.ReactNode {
                     return (
                       <tr key={u.userID}>
-                        <td>
+                        <td id="select_column">
                           <input type="radio" name="selectUser" value={u.userID}
                                  onClick={ () => self.selectUser(u) } 
                                  checked={u.userID == self.state.checkedUserID}
                                  onChange={(e) => self.setState({ checkedUserID: e.target.value }) }/>
                         </td>
-                        <td>{u.userID}</td>
-                        <td>{u.userName}</td>
-                        <td><button onClick={ () => self.showApis(u) }>＞＞</button></td>
+                        <td id="userid_column">{u.userID}</td>
+                        <td id="username_column">{u.userName}</td>
+                        <td id="sub_column"><button onClick={ () => self.showApis(u) }>＞＞</button></td>
                       </tr>
                     )
                   }
@@ -256,48 +259,56 @@ export class UserMgr
       var name = ""
       var password = ""
       return (
-        <div>
+        <div id="detail_pane">
           <h2>ユーザ編集</h2>
-          <div>
-            <label>ユーザID</label>
-            <input type="text" onChange = {(e:any) => identify = e.target.value} />
-          </div>
-          <div>
-            <label>ユーザ名</label>
-            <input type="text" onChange = {(e:any) => name = e.target.value} />
-          </div>
-          <div>
-            <label>パスワード</label>
-            <input type="password" onChange = {(e:any) => password=e.target.value} />
-          </div>
-          <div>
-            <button onClick={() => props.onCancel()}>キャンセル</button>
-            <button onClick={() => props.onSave(identify, name, password)}>保存</button>
-          </div>
+          <hr/>
+          <table id="input_pane"><tbody>
+            <tr>
+              <td id="label"><label>ユーザID</label></td>
+              <td id="value"><input type="text" onChange = {(e:any) => identify = e.target.value} /></td>
+            </tr>
+            <tr>
+              <td id="label"><label>ユーザ名</label></td>
+              <td id="value"><input type="text" onChange = {(e:any) => name = e.target.value} /></td>
+            </tr>
+            <tr>
+              <td id="label"><label>パスワード</label></td>
+              <td id="value"><input type="password" onChange = {(e:any) => password=e.target.value} /></td>
+            </tr>
+            <tr>
+              <td colSpan={2} id="button_area">
+                <button onClick={() => props.onCancel()}>キャンセル</button>
+                <button onClick={() => props.onSave(identify, name, password)}>保存</button>
+              </td>
+            </tr>
+          </tbody></table>
         </div>
       )
     }
 
     if (this.state.client && this.state.users) {
       return (
-        <div>
+        <div id="usermgr">
           <h1>ユーザメンテナンス</h1>
-          <div><button onClick={() => this.props.history.goBack()}>メニューへ</button></div>
-          <div>
-            <label>クライアント</label>
-            <input type="text" readOnly={true} value={this.state.client}/>
-            <button type="button" onClick={ () => this.logout() }>ログアウト</button>
-            <button type="button" onClick={ () => this.clearAllHistory() }>全履歴クリア</button>
+          <hr/>
+          <div id="button_area">
+            <button onClick={() => this.props.history.goBack()}>メニューへ</button>
+            <button type="button" onClick={ () => this.newUser() }>追加</button>
+            <button type="button" onClick={ () => this.refreshUserList() }>再取得</button>
+            <button onClick={ () => this.clearAllHistory() }>全履歴クリア</button>
+            <button onClick={ () => this.logout() }>ログアウト</button>
           </div>
-          <table>
+          <div id="description">
+            <div>
+              <label>クライアント</label>
+              <input type="text" readOnly={true} value={this.state.client}/>
+            </div>
+          </div>
+          <table id="main_area">
             <tbody>
             <tr>
-              <td>
-                <div>
-                  <button type="button" onClick={ () => this.newUser() }>追加</button>
-                  <button type="button" onClick={ () => this.refreshUserList() }>再取得</button>
+              <td id="list_pane">
                   <UserList users={ this.state.users } onSelect={ u => this.selectUser(u) } onShowAPI={ u => this.showApi(u) }/>
-                </div>
               </td>
               <td>
                 <div>

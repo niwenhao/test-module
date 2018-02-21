@@ -33,27 +33,28 @@ class ApiNewPane extends React.Component<ApiNewProps, ApiNewState> {
 
   render(): React.ReactNode {
     return (
-      <div>
-        <h1>API追加</h1>
-        <table>
+      <div id="detail_pane">
+        <h2>API追加</h2>
+        <hr/>
+        <table id="input_pane">
           <tr>
-            <td><label>PATH</label></td>
-            <td><input type="text" value={this.state.apiPath} onChange={(e) => this.setState({apiPath: e.target.value})}/></td>
+            <td id="label"><label>PATH</label></td>
+            <td id="value"><input type="text" value={this.state.apiPath} onChange={(e) => this.setState({apiPath: e.target.value})}/></td>
           </tr>
           <tr>
-            <td><label>詳細</label></td>
-            <td><input type="text" value={this.state.apiName} onChange={(e) => this.setState({apiName: e.target.value})}/></td>
+            <td id="label"><label>詳細</label></td>
+            <td id="value"><input type="text" value={this.state.apiName} onChange={(e) => this.setState({apiName: e.target.value})}/></td>
           </tr>
           <tr>
-            <td><label>条件</label></td>
-            <td><textarea onChange={(e) => this.setState({condition: e.target.value})}>{this.state.condition}</textarea></td>
+            <td id="label"><label>条件</label></td>
+            <td id="value"><textarea onChange={(e) => this.setState({condition: e.target.value})}>{this.state.condition}</textarea></td>
           </tr>
           <tr>
-            <td><label>レスポンス</label></td>
-            <td><textarea onChange={(e) => this.setState({response: e.target.value})}>{this.state.response}</textarea></td>
+            <td id="label"><label>レスポンス</label></td>
+            <td id="value"><textarea onChange={(e) => this.setState({response: e.target.value})}>{this.state.response}</textarea></td>
           </tr>
         </table>
-        <div>
+        <div id="button_area">
           <button onClick={() => this.save()}>保存</button>
           <button onClick={() => this.cancel()}>キャンセル</button>
         </div>
@@ -81,7 +82,7 @@ class ApiEditPane extends React.Component<ApiEditProps, ApiEditState> {
     this.state = {
       apiPath: props.api.apiPath,
       apiName: props.api.apiName,
-      condition: props.api.conditionJson,
+      condition: props.api.conditionJs,
       response: props.api.responseJson
     }
   }
@@ -90,7 +91,7 @@ class ApiEditPane extends React.Component<ApiEditProps, ApiEditState> {
     this.setState({
       apiPath: props.api.apiPath,
       apiName: props.api.apiName,
-      condition: props.api.conditionJson,
+      condition: props.api.conditionJs,
       response: props.api.responseJson
     })
   }
@@ -105,7 +106,7 @@ class ApiEditPane extends React.Component<ApiEditProps, ApiEditState> {
   save() {
     this.props.api.apiPath = this.state.apiPath
     this.props.api.apiName = this.state.apiName
-    this.props.api.conditionJson = this.state.condition
+    this.props.api.conditionJs = this.state.condition
     this.props.api.responseJson = this.state.response
 
     this.props.onSave(this.props.api)
@@ -117,24 +118,24 @@ class ApiEditPane extends React.Component<ApiEditProps, ApiEditState> {
 
   render(): React.ReactNode {
     return (
-      <div>
+      <div id="detail_pane">
         <h1>API変更</h1>
-        <table>
+        <table id="input_pane">
           <tr>
-            <td><label>PATH</label></td>
-            <td><input type="text" value={this.state.apiPath} onChange={(e) => this.setState({apiPath: e.target.value})}/></td>
+            <td id="label"><label>PATH</label></td>
+            <td id="value"><input type="text" value={this.state.apiPath} onChange={(e) => this.setState({apiPath: e.target.value})}/></td>
           </tr>
           <tr>
-            <td><label>詳細</label></td>
-            <td><input type="text" value={this.state.apiName} onChange={(e) => this.setState({apiName: e.target.value})}/></td>
+            <td id="label"><label>詳細</label></td>
+            <td id="value"><input type="text" value={this.state.apiName} onChange={(e) => this.setState({apiName: e.target.value})}/></td>
           </tr>
           <tr>
-            <td><label>条件</label></td>
-            <td><textarea onChange={(e) => this.setState({condition: e.target.value})} value={this.state.condition}></textarea></td>
+            <td id="label"><label>条件</label></td>
+            <td id="value"><textarea onChange={(e) => this.setState({condition: e.target.value})} value={this.state.condition}></textarea></td>
           </tr>
           <tr>
-            <td><label>レスポンス</label></td>
-            <td><textarea onChange={(e) => this.setState({response: e.target.value})} value={this.state.response}></textarea></td>
+            <td id="label"><label>レスポンス</label></td>
+            <td id="value"><textarea onChange={(e) => this.setState({response: e.target.value})} value={this.state.response}></textarea></td>
           </tr>
         </table>
         <div>
@@ -219,7 +220,7 @@ export class ApiMgr extends React.Component<RouteComponentProps<ApiMgrRoutParm>,
     let props: Api = {
       apiPath: path,
       apiName: name,
-      conditionJson: con,
+      conditionJs: con,
       responseJson: res
     }
     this.state.apis!.create(props, {
@@ -255,15 +256,15 @@ export class ApiMgr extends React.Component<RouteComponentProps<ApiMgrRoutParm>,
       console.log(`api = ${JSON.stringify(api)}`)
       return (
         <tr key={api.id}>
-          <td>
+          <td id="select_column">
             <input type='radio'
                   checked={(this.state.currentApi && this.state.currentApi!.id) == api.id}
                   onClick={ () => this.selectApi(api)}
                   value={ api.id }/>
           </td>
-          <td>{ api.apiPath }</td>
-          <td>{ api.apiName }</td>
-          <td>
+          <td id="path_column"  >{ api.apiPath }</td>
+          <td id="name_column"  >{ api.apiName }</td>
+          <td id="sub_column"   >
             <button onClick={ () => this.showHistory(api) }>＞＞</button>
           </td>
         </tr>
@@ -285,32 +286,33 @@ export class ApiMgr extends React.Component<RouteComponentProps<ApiMgrRoutParm>,
     }
     if (this.state.client && this.state.apis && this.state.user) {
       return (
-        <div>
+        <div id="apimgr">
           <h1>APIメンテナンス</h1>
-          <div><button onClick={() => this.back()}>ユーザメンテへ</button></div>
-          <div>
+          <hr/>
+          <div id="button_area">
+            <button onClick={() => this.back()}>ユーザメンテへ</button>
+            <button onClick={ () => this.refreshApiList() }>更新</button>
+            <button onClick={ () => this.appendApi() }>追加</button>
+          </div>
+          <div id="description">
             <label>クライアント</label>
             <input type='text' readOnly={true} value={`${this.state.client!.clientName}(${this.state.client!.clientKey})`}/>
           </div>
-          <div>
+          <div id="description">
             <label>ユーザ</label>
             <input type='text' readOnly={true} value={`${this.state.user!.userName}(${this.state.user!.userID})`}/>
           </div>
-          <table>
+          <table id="main_area">
             <tbody>
             <tr>
-              <td>
-                <div>
-                  <button onClick={ () => this.refreshApiList() }>更新</button>
-                  <button onClick={ () => this.appendApi() }>追加</button>
-                </div>
+              <td id="list_pane">
                 <table>
                   <tbody>
-                  <tr>
-                    <td>選択</td>
-                    <td>PATH</td>
-                    <td>詳細</td>
-                    <td>履歴</td>
+                  <tr id="title">
+                    <td id="select_column">選択</td>
+                    <td id="path_column"  >PATH</td>
+                    <td id="name_column"  >詳細</td>
+                    <td id="sub_column"   >履歴</td>
                   </tr>
                   { this.state.apis.models.map((api) => ShowApi(api)) }
                   </tbody>
