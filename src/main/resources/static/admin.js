@@ -207,12 +207,25 @@ var ApiNewPane = /** @class */ (function (_super) {
             apiPath: "",
             apiName: "",
             condition: "",
-            response: ""
+            status: "200",
+            headers: "",
+            body: ""
         };
         return _this;
     }
     ApiNewPane.prototype.save = function () {
-        this.props.onSave(this.state.apiPath, this.state.apiName, this.state.condition, this.state.response);
+        var responseData = {
+            status: parseInt(this.state.status),
+            headers: this.state.headers.split(/\n/).map(function (u) {
+                var header = u.split(/: */);
+                return {
+                    name: header[0],
+                    value: header[1]
+                };
+            }),
+            body: this.state.body
+        };
+        this.props.onSave(this.state.apiPath, this.state.apiName, this.state.condition, JSON.stringify(responseData));
     };
     ApiNewPane.prototype.cancel = function () {
         this.props.onCancel();
@@ -237,12 +250,22 @@ var ApiNewPane = /** @class */ (function (_super) {
                     React.createElement("td", { id: "label" },
                         React.createElement("label", null, "\u6761\u4EF6")),
                     React.createElement("td", { id: "value" },
-                        React.createElement("textarea", { onChange: function (e) { return _this.setState({ condition: e.target.value }); } }, this.state.condition))),
+                        React.createElement("textarea", { onChange: function (e) { return _this.setState({ condition: e.target.value }); } }))),
                 React.createElement("tr", null,
                     React.createElement("td", { id: "label" },
-                        React.createElement("label", null, "\u30EC\u30B9\u30DD\u30F3\u30B9")),
+                        React.createElement("label", null, "\u30B9\u30C6\u30FC\u30BF\u30B9")),
                     React.createElement("td", { id: "value" },
-                        React.createElement("textarea", { onChange: function (e) { return _this.setState({ response: e.target.value }); } }, this.state.response)))),
+                        React.createElement("input", { type: "text", onChange: function (e) { return _this.setState({ status: e.target.value }); } }))),
+                React.createElement("tr", null,
+                    React.createElement("td", { id: "label" },
+                        React.createElement("label", null, "\u30D8\u30C3\u30C0\u30FC")),
+                    React.createElement("td", { id: "value" },
+                        React.createElement("textarea", { onChange: function (e) { return _this.setState({ headers: e.target.value }); } }))),
+                React.createElement("tr", null,
+                    React.createElement("td", { id: "label" },
+                        React.createElement("label", null, "\u30DC\u30C7\u30A3")),
+                    React.createElement("td", { id: "value" },
+                        React.createElement("textarea", { onChange: function (e) { return _this.setState({ body: e.target.value }); } })))),
             React.createElement("div", { id: "button_area" },
                 React.createElement("button", { onClick: function () { return _this.save(); } }, "\u4FDD\u5B58"),
                 React.createElement("button", { onClick: function () { return _this.cancel(); } }, "\u30AD\u30E3\u30F3\u30BB\u30EB"))));
@@ -253,20 +276,26 @@ var ApiEditPane = /** @class */ (function (_super) {
     __extends(ApiEditPane, _super);
     function ApiEditPane(props) {
         var _this = _super.call(this, props) || this;
+        var responseData = JSON.parse(props.api.responseJson);
         _this.state = {
             apiPath: props.api.apiPath,
             apiName: props.api.apiName,
             condition: props.api.conditionJs,
-            response: props.api.responseJson
+            status: responseData.status.toString(),
+            headers: responseData.headers.map(function (u) { return u.name + ": " + u.value; }).join("\n"),
+            body: responseData.body
         };
         return _this;
     }
     ApiEditPane.prototype.componentWillReceiveProps = function (props, context) {
+        var responseData = JSON.parse(props.api.responseJson);
         this.setState({
             apiPath: props.api.apiPath,
             apiName: props.api.apiName,
             condition: props.api.conditionJs,
-            response: props.api.responseJson
+            status: responseData.status.toString(),
+            headers: responseData.headers.map(function (u) { return u.name + ": " + u.value; }).join("\n"),
+            body: responseData.body
         });
     };
     ApiEditPane.prototype.clearHistory = function () {
@@ -276,10 +305,21 @@ var ApiEditPane = /** @class */ (function (_super) {
         this.props.onDelete(this.props.api);
     };
     ApiEditPane.prototype.save = function () {
+        var responseData = {
+            status: parseInt(this.state.status),
+            headers: this.state.headers.split(/\n/).map(function (u) {
+                var header = u.split(/: */);
+                return {
+                    name: header[0],
+                    value: header[1]
+                };
+            }),
+            body: this.state.body
+        };
         this.props.api.apiPath = this.state.apiPath;
         this.props.api.apiName = this.state.apiName;
         this.props.api.conditionJs = this.state.condition;
-        this.props.api.responseJson = this.state.response;
+        this.props.api.responseJson = JSON.stringify(responseData);
         this.props.onSave(this.props.api);
     };
     ApiEditPane.prototype.cancel = function () {

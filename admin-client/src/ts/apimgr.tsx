@@ -63,19 +63,19 @@ class ApiNewPane extends React.Component<ApiNewProps, ApiNewState> {
           </tr>
           <tr>
             <td id="label"><label>条件</label></td>
-            <td id="value"><textarea onChange={(e) => this.setState({condition: e.target.value})}></textarea></td>
+            <td id="value"><textarea onChange={(e) => this.setState({condition: e.target.value})} value={this.state.condition}></textarea></td>
           </tr>
           <tr>
             <td id="label"><label>ステータス</label></td>
-            <td id="value"><input type="text" onChange={(e) => this.setState({status: e.target.value})}/></td>
+            <td id="value"><input type="text" onChange={(e) => this.setState({status: e.target.value})} value={this.state.status}/></td>
           </tr>
           <tr>
             <td id="label"><label>ヘッダー</label></td>
-            <td id="value"><textarea onChange={(e) => this.setState({headers: e.target.value})}></textarea></td>
+            <td id="value"><textarea onChange={(e) => this.setState({headers: e.target.value})} value={this.state.headers}></textarea></td>
           </tr>
           <tr>
             <td id="label"><label>ボディ</label></td>
-            <td id="value"><textarea onChange={(e) => this.setState({body: e.target.value})}></textarea></td>
+            <td id="value"><textarea onChange={(e) => this.setState({body: e.target.value})} value={this.state.body}></textarea></td>
           </tr>
         </table>
         <div id="button_area">
@@ -181,8 +181,16 @@ class ApiEditPane extends React.Component<ApiEditProps, ApiEditState> {
             <td id="value"><textarea onChange={(e) => this.setState({condition: e.target.value})} value={this.state.condition}></textarea></td>
           </tr>
           <tr>
-            <td id="label"><label>レスポンス</label></td>
-            <td id="value"><textarea onChange={(e) => this.setState({response: e.target.value})} value={this.state.response}></textarea></td>
+            <td id="label"><label>ステータス</label></td>
+            <td id="value"><input type="text" onChange={(e) => this.setState({status: e.target.value})} value={this.state.status}/></td>
+          </tr>
+          <tr>
+            <td id="label"><label>ヘッダー</label></td>
+            <td id="value"><textarea onChange={(e) => this.setState({headers: e.target.value})} value={this.state.headers}></textarea></td>
+          </tr>
+          <tr>
+            <td id="label"><label>ボディ</label></td>
+            <td id="value"><textarea onChange={(e) => this.setState({body: e.target.value})} value={this.state.body}></textarea></td>
           </tr>
         </table>
         <div>
