@@ -3,6 +3,8 @@ package jp.co.nri.openapi.testprovider.model
 import com.fasterxml.jackson.databind.ObjectMapper
 import jp.co.nri.openapi.testprovider.model.entity.ProviderApi
 import jp.co.nri.openapi.testprovider.model.entity.ProviderApiHist
+import jp.co.nri.openapi.testprovider.model.entity.ProviderApiHistRepository
+import jp.co.nri.openapi.testprovider.model.entity.ProviderUser
 import org.springframework.stereotype.Component
 import org.springframework.stereotype.Repository
 import org.springframework.stereotype.Service
@@ -12,7 +14,7 @@ import javax.annotation.Resource
 import javax.persistence.EntityManager
 import javax.persistence.PersistenceContext
 
-data class RemoveHistoryResult(val result: Boolean)
+data class RemoveHistoryResult(val result: Boolean, val message: String = "")
 
 @Component
 interface HistoryDao {
@@ -28,7 +30,9 @@ interface HistoryDao {
 @Service
 open class HistoryDaoImpl(
         @PersistenceContext
-        val em: EntityManager
+        val em: EntityManager,
+        @Resource
+        val repo: ProviderApiHistRepository
 ): HistoryDao {
     @Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED)
     override fun addHistory(apiId: Long, req: ApiRequest, res: ApiResponse) {
@@ -49,41 +53,25 @@ open class HistoryDaoImpl(
 
     @Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED)
     override fun removeByApiId(id: Long): RemoveHistoryResult {
-        return if (em.createQuery("delete from ProviderApiHist h where h.api.id = :id")
-                .setParameter("id", id)
-                .executeUpdate() > 0)
-            RemoveHistoryResult(true)
-        else
-            RemoveHistoryResult(false)
+        repo.deleteInBatch(repo.findHistByApiId(id))
+        return RemoveHistoryResult(true)
     }
 
     @Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED)
     override fun removeByClientKey(clientKey: String): RemoveHistoryResult {
-        return if (em.createQuery("delete from ProviderApiHist h where h.api.user.clientKey = :key")
-                .setParameter("key", clientKey)
-                .executeUpdate() > 0)
-            RemoveHistoryResult(true)
-        else
-            RemoveHistoryResult(false)
+        repo.deleteInBatch(repo.findHistIdByClientKey(clientKey))
+        return RemoveHistoryResult(true)
     }
 
     @Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED)
     override fun removeById(id: Long): RemoveHistoryResult {
-        return if (em.createQuery("delete from ProviderApiHist h where h.id = :id")
-                .setParameter("id", id)
-                .executeUpdate() > 0)
-            RemoveHistoryResult(true)
-        else
-            RemoveHistoryResult(false)
+        repo.delete(id)
+        return RemoveHistoryResult(true)
     }
 
     @Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED)
     override fun removeByUserId(id: Long): RemoveHistoryResult {
-        return if (em.createQuery("delete from ProviderApiHist h where h.api.user.id = :id")
-                .setParameter("id", id)
-                .executeUpdate() > 0)
-            RemoveHistoryResult(true)
-        else
-            RemoveHistoryResult(false)
+        repo.deleteInBatch(repo.findHistByUserId(id))
+        return RemoveHistoryResult(true)
     }
 }

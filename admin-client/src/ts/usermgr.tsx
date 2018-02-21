@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Link, Redirect } from "react-router-dom
 import { RouteComponentProps } from 'react-router'
 
 import { User, UserModel, UserCollection, ClientModel } from './common/entities'
+import * as JQuery from "jquery"
 
 interface UserEditorState {
   userID: string
@@ -235,7 +236,17 @@ export class UserMgr
   }
 
   clearUserHistory(user: UserModel) {
-
+    JQuery.ajax({
+      url: `/api/hist/user/${user.id}`,
+      method: "DELETE",
+      success: (data: {result: boolean, message: string}) => {
+        if (data.result) {
+          alert("Remove successed.")
+        } else {
+          alert("Remove failed.")
+        }
+      }
+    })
   }
 
   selectUser(u:UserModel) {
@@ -246,6 +257,17 @@ export class UserMgr
   }
 
   clearAllHistory() {
+    JQuery.ajax({
+      url: "/api/hist/client",
+      method: "DELETE",
+      success: (data: {result: boolean, message: string}) => {
+        if (data.result) {
+          alert("Remove successed.")
+        } else {
+          alert("Remove failed.")
+        }
+      }
+    })
   }
 
   showApi(u: UserModel) {
@@ -295,8 +317,8 @@ export class UserMgr
             <button onClick={() => this.props.history.goBack()}>メニューへ</button>
             <button type="button" onClick={ () => this.newUser() }>追加</button>
             <button type="button" onClick={ () => this.refreshUserList() }>再取得</button>
-            <button onClick={ () => this.clearAllHistory() }>全履歴クリア</button>
-            <button onClick={ () => this.logout() }>ログアウト</button>
+            <button onClick={ () => this.clearAllHistory() }>全履歴削除</button>
+            <button onClick={() => window.open("/test-data-manager/index", "_self")}>ログアウト</button>
           </div>
           <div id="description">
             <div>

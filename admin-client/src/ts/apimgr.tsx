@@ -1,4 +1,5 @@
 import * as React from "react"
+import * as JQuery from "jquery"
 import { BrowserRouter, Route, Link, RouteComponentProps } from "react-router-dom"
 import { ClientModel, UserModel, Api, ApiModel, ApiCollection, RequestData, ResponseData } from './common/entities'
 
@@ -31,10 +32,10 @@ class ApiNewPane extends React.Component<ApiNewProps, ApiNewState> {
     let responseData : ResponseData = {
       status: parseInt(this.state.status),
       headers: this.state.headers.split(/\n/).map(function(u: string) {
-        let header = u.split(/: */)
+        let index = u.indexOf(":")
         return {
-          name: header[0],
-          value: header[1]
+          name: u.substring(0, index),
+          value: u.substring(index + 1).replace(/^ */, "")
         }
       }),
       body: this.state.body
@@ -142,10 +143,10 @@ class ApiEditPane extends React.Component<ApiEditProps, ApiEditState> {
     let responseData : ResponseData = {
       status: parseInt(this.state.status),
       headers: this.state.headers.split(/\n/).map(function(u: string) {
-        let header = u.split(/: */)
+        let index = u.indexOf(":")
         return {
-          name: header[0],
-          value: header[1]
+          name: u.substring(0, index),
+          value: u.substring(index + 1).replace(/^ */, "")
         }
       }),
       body: this.state.body
@@ -296,7 +297,17 @@ export class ApiMgr extends React.Component<RouteComponentProps<ApiMgrRoutParm>,
   }
 
   clearHistory(api: ApiModel) {
-
+    JQuery.ajax({
+      url: `/api/hist/api/${api.id}`,
+      method: "DELETE",
+      success: (data: {result: boolean, message: string}) => {
+        if (data.result) {
+          alert("Remove successed.")
+        } else {
+          alert("Remove failed.")
+        }
+      }
+    })
   }
 
   cancel() {
@@ -348,6 +359,7 @@ export class ApiMgr extends React.Component<RouteComponentProps<ApiMgrRoutParm>,
             <button onClick={() => this.back()}>ユーザメンテへ</button>
             <button onClick={ () => this.refreshApiList() }>更新</button>
             <button onClick={ () => this.appendApi() }>追加</button>
+            <button onClick={() => window.open("/test-data-manager/index", "_self")}>ログアウト</button>
           </div>
           <div id="description">
             <label>クライアント</label>

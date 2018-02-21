@@ -87,6 +87,7 @@ export class HistMgr extends React.Component<RouteComponentProps<any>, HistMgrSt
           <div id="button_area">
             <button onClick={() => this.props.history.goBack()}>APIメンテへ</button>
             <button onClick={() => self.refresh()}>再取得</button>
+            <button onClick={() => window.open("/test-data-manager/index", "_self")}>ログアウト</button>
           </div>
           <div id="description">
               <label>クライアント</label>

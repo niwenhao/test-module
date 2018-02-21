@@ -15,10 +15,15 @@ function MenuPane(props: RouteComponentProps<any>) {
     props.history.push("./users")
   }
   return (
-    <div>
-      <div><button onClick={() => doConfig()}>設定管理</button></div>
-      <div><button onClick={() => doUserApi()}>ユーザ・API管理</button></div>
-      <div><button onClick={() => window.open("/test-data-manager/index", "_self")}>ログアウト</button></div>
+    <div id="menu_pane">
+      <h1>APIテストモジュール</h1>
+      <h2>テストデータ設定</h2>
+      <hr/>
+      <div id="button_area">
+        <div><button onClick={() => doConfig()}>設定管理</button></div>
+        <div><button onClick={() => doUserApi()}>ユーザ・API管理</button></div>
+        <div><button onClick={() => window.open("/test-data-manager/index", "_self")}>ログアウト</button></div>
+      </div>
     </div>
   )
 }

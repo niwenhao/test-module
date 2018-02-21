@@ -173,7 +173,7 @@ class HistoryServiceController(
         val histDao: HistoryDao
 ) {
 
-    @RequestMapping("/api/{apiId}")
+    @RequestMapping("/api/{apiId}", method = arrayOf(RequestMethod.GET))
     fun listByApiId(
             session: HttpSession,
             @PathVariable
@@ -184,13 +184,46 @@ class HistoryServiceController(
         } ?: listOf<ProviderApiHist>()
     }
 
+    @RequestMapping("/client", method = arrayOf(RequestMethod.DELETE))
+    fun removeByClientId(
+            session: HttpSession
+    ): RemoveHistoryResult {
+        return (session.getAttribute(Const.SK_CLIENT) as Client?)?.let { c ->
+            histDao.removeByClientKey(c.clientKey)
+        }?: RemoveHistoryResult(false)
+    }
+
+    @RequestMapping("/user/{userId}", method = arrayOf(RequestMethod.DELETE))
+    fun removeByUserId(
+            session: HttpSession,
+            @PathVariable
+            userId: Long
+    ): RemoveHistoryResult {
+        return (session.getAttribute(Const.SK_CLIENT) as Client?)?.let {
+            histDao.removeByUserId(userId)
+        }?: RemoveHistoryResult(false)
+    }
+
+    @RequestMapping("/api/{apiId}", method = arrayOf(RequestMethod.DELETE))
+    fun removeByApiId(
+            session: HttpSession,
+            @PathVariable
+            apiId: Long
+    ): RemoveHistoryResult {
+        return (session.getAttribute(Const.SK_CLIENT) as Client?)?.let {
+            histDao.removeByApiId(apiId)
+        }?: RemoveHistoryResult(false)
+    }
+
     @RequestMapping(path = arrayOf("/api/{apiId}/{histId}"), method = arrayOf(RequestMethod.DELETE))
     fun removeById(
             session: HttpSession,
             @PathVariable
             histId: Long
     ): RemoveHistoryResult {
-        return histDao.removeById(histId)
+        return (session.getAttribute(Const.SK_CLIENT) as Client?)?.let {
+            histDao.removeById(histId)
+        }?: RemoveHistoryResult(false, "Failed to remove history")
     }
 }
 
@@ -203,6 +236,7 @@ class ConfigServiceController(
     fun list(
             session: HttpSession
     ): List<ConfigEntity> {
+        ApiInvokeAdapter.config = configDao.properties()
         return session.getAttribute(Const.SK_CLIENT)?.let {
             configDao.list()
         }?: listOf()

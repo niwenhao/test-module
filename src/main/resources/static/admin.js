@@ -198,6 +198,7 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var React = require("react");
+var JQuery = require("jquery");
 var entities_1 = require("./common/entities");
 var ApiNewPane = /** @class */ (function (_super) {
     __extends(ApiNewPane, _super);
@@ -217,10 +218,10 @@ var ApiNewPane = /** @class */ (function (_super) {
         var responseData = {
             status: parseInt(this.state.status),
             headers: this.state.headers.split(/\n/).map(function (u) {
-                var header = u.split(/: */);
+                var index = u.indexOf(":");
                 return {
-                    name: header[0],
-                    value: header[1]
+                    name: u.substring(0, index),
+                    value: u.substring(index + 1).replace(/^ */, "")
                 };
             }),
             body: this.state.body
@@ -308,10 +309,10 @@ var ApiEditPane = /** @class */ (function (_super) {
         var responseData = {
             status: parseInt(this.state.status),
             headers: this.state.headers.split(/\n/).map(function (u) {
-                var header = u.split(/: */);
+                var index = u.indexOf(":");
                 return {
-                    name: header[0],
-                    value: header[1]
+                    name: u.substring(0, index),
+                    value: u.substring(index + 1).replace(/^ */, "")
                 };
             }),
             body: this.state.body
@@ -451,6 +452,18 @@ var ApiMgr = /** @class */ (function (_super) {
         });
     };
     ApiMgr.prototype.clearHistory = function (api) {
+        JQuery.ajax({
+            url: "/api/hist/api/" + api.id,
+            method: "DELETE",
+            success: function (data) {
+                if (data.result) {
+                    alert("Remove successed.");
+                }
+                else {
+                    alert("Remove failed.");
+                }
+            }
+        });
     };
     ApiMgr.prototype.cancel = function () {
         this.setState({
@@ -484,7 +497,8 @@ var ApiMgr = /** @class */ (function (_super) {
                 React.createElement("div", { id: "button_area" },
                     React.createElement("button", { onClick: function () { return _this.back(); } }, "\u30E6\u30FC\u30B6\u30E1\u30F3\u30C6\u3078"),
                     React.createElement("button", { onClick: function () { return _this.refreshApiList(); } }, "\u66F4\u65B0"),
-                    React.createElement("button", { onClick: function () { return _this.appendApi(); } }, "\u8FFD\u52A0")),
+                    React.createElement("button", { onClick: function () { return _this.appendApi(); } }, "\u8FFD\u52A0"),
+                    React.createElement("button", { onClick: function () { return window.open("/test-data-manager/index", "_self"); } }, "\u30ED\u30B0\u30A2\u30A6\u30C8")),
                 React.createElement("div", { id: "description" },
                     React.createElement("label", null, "\u30AF\u30E9\u30A4\u30A2\u30F3\u30C8"),
                     React.createElement("input", { type: 'text', readOnly: true, value: this.state.client.clientName + "(" + this.state.client.clientKey + ")" })),
@@ -513,7 +527,7 @@ var ApiMgr = /** @class */ (function (_super) {
 }(React.Component));
 exports.ApiMgr = ApiMgr;
 
-},{"./common/entities":3,"react":72}],3:[function(require,module,exports){
+},{"./common/entities":3,"jquery":36,"react":72}],3:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
@@ -1067,7 +1081,8 @@ var HistMgr = /** @class */ (function (_super) {
                 React.createElement("hr", null),
                 React.createElement("div", { id: "button_area" },
                     React.createElement("button", { onClick: function () { return _this.props.history.goBack(); } }, "API\u30E1\u30F3\u30C6\u3078"),
-                    React.createElement("button", { onClick: function () { return self.refresh(); } }, "\u518D\u53D6\u5F97")),
+                    React.createElement("button", { onClick: function () { return self.refresh(); } }, "\u518D\u53D6\u5F97"),
+                    React.createElement("button", { onClick: function () { return window.open("/test-data-manager/index", "_self"); } }, "\u30ED\u30B0\u30A2\u30A6\u30C8")),
                 React.createElement("div", { id: "description" },
                     React.createElement("label", null, "\u30AF\u30E9\u30A4\u30A2\u30F3\u30C8"),
                     React.createElement("input", { type: "text", readOnly: true, value: this.state.client.clientName + "(" + this.state.client.clientKey + ")" })),
@@ -1167,13 +1182,17 @@ function MenuPane(props) {
     var doUserApi = function () {
         props.history.push("./users");
     };
-    return (React.createElement("div", null,
-        React.createElement("div", null,
-            React.createElement("button", { onClick: function () { return doConfig(); } }, "\u8A2D\u5B9A\u7BA1\u7406")),
-        React.createElement("div", null,
-            React.createElement("button", { onClick: function () { return doUserApi(); } }, "\u30E6\u30FC\u30B6\u30FBAPI\u7BA1\u7406")),
-        React.createElement("div", null,
-            React.createElement("button", { onClick: function () { return window.open("/test-data-manager/index", "_self"); } }, "\u30ED\u30B0\u30A2\u30A6\u30C8"))));
+    return (React.createElement("div", { id: "menu_pane" },
+        React.createElement("h1", null, "API\u30C6\u30B9\u30C8\u30E2\u30B8\u30E5\u30FC\u30EB"),
+        React.createElement("h2", null, "\u30C6\u30B9\u30C8\u30C7\u30FC\u30BF\u8A2D\u5B9A"),
+        React.createElement("hr", null),
+        React.createElement("div", { id: "button_area" },
+            React.createElement("div", null,
+                React.createElement("button", { onClick: function () { return doConfig(); } }, "\u8A2D\u5B9A\u7BA1\u7406")),
+            React.createElement("div", null,
+                React.createElement("button", { onClick: function () { return doUserApi(); } }, "\u30E6\u30FC\u30B6\u30FBAPI\u7BA1\u7406")),
+            React.createElement("div", null,
+                React.createElement("button", { onClick: function () { return window.open("/test-data-manager/index", "_self"); } }, "\u30ED\u30B0\u30A2\u30A6\u30C8")))));
 }
 function MainPane(props) {
     return (React.createElement(react_router_dom_1.BrowserRouter, null,
@@ -1203,6 +1222,7 @@ var __extends = (this && this.__extends) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 var React = require("react");
 var entities_1 = require("./common/entities");
+var JQuery = require("jquery");
 var UserEditor = /** @class */ (function (_super) {
     __extends(UserEditor, _super);
     function UserEditor(props) {
@@ -1379,6 +1399,18 @@ var UserMgr = /** @class */ (function (_super) {
         });
     };
     UserMgr.prototype.clearUserHistory = function (user) {
+        JQuery.ajax({
+            url: "/api/hist/user/" + user.id,
+            method: "DELETE",
+            success: function (data) {
+                if (data.result) {
+                    alert("Remove successed.");
+                }
+                else {
+                    alert("Remove failed.");
+                }
+            }
+        });
     };
     UserMgr.prototype.selectUser = function (u) {
         this.setState({
@@ -1387,6 +1419,18 @@ var UserMgr = /** @class */ (function (_super) {
         });
     };
     UserMgr.prototype.clearAllHistory = function () {
+        JQuery.ajax({
+            url: "/api/hist/client",
+            method: "DELETE",
+            success: function (data) {
+                if (data.result) {
+                    alert("Remove successed.");
+                }
+                else {
+                    alert("Remove failed.");
+                }
+            }
+        });
     };
     UserMgr.prototype.showApi = function (u) {
         this.props.history.push(this.props.match.url + "/" + u.id + "/apis");
@@ -1430,8 +1474,8 @@ var UserMgr = /** @class */ (function (_super) {
                     React.createElement("button", { onClick: function () { return _this.props.history.goBack(); } }, "\u30E1\u30CB\u30E5\u30FC\u3078"),
                     React.createElement("button", { type: "button", onClick: function () { return _this.newUser(); } }, "\u8FFD\u52A0"),
                     React.createElement("button", { type: "button", onClick: function () { return _this.refreshUserList(); } }, "\u518D\u53D6\u5F97"),
-                    React.createElement("button", { onClick: function () { return _this.clearAllHistory(); } }, "\u5168\u5C65\u6B74\u30AF\u30EA\u30A2"),
-                    React.createElement("button", { onClick: function () { return _this.logout(); } }, "\u30ED\u30B0\u30A2\u30A6\u30C8")),
+                    React.createElement("button", { onClick: function () { return _this.clearAllHistory(); } }, "\u5168\u5C65\u6B74\u524A\u9664"),
+                    React.createElement("button", { onClick: function () { return window.open("/test-data-manager/index", "_self"); } }, "\u30ED\u30B0\u30A2\u30A6\u30C8")),
                 React.createElement("div", { id: "description" },
                     React.createElement("div", null,
                         React.createElement("label", null, "\u30AF\u30E9\u30A4\u30A2\u30F3\u30C8"),
@@ -1458,7 +1502,7 @@ var UserMgr = /** @class */ (function (_super) {
 }(React.Component));
 exports.UserMgr = UserMgr;
 
-},{"./common/entities":3,"react":72}],8:[function(require,module,exports){
+},{"./common/entities":3,"jquery":36,"react":72}],8:[function(require,module,exports){
 (function (global){
 //     Backbone.js 1.3.3
 
