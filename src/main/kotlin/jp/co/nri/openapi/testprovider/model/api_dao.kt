@@ -29,7 +29,9 @@ open class ApiDaoImpl(
         var em: EntityManager
 ): ApiDao {
     override fun getInvokedApiList(userId: String, path: String): List<ProviderApi> {
-        val query = em.createQuery("select a from ProviderApi a where a.user.userID = :userId and a.apiPath = :path", ProviderApi::class.java)
+        val query = em.createQuery(
+                "select a from ProviderApi a " +
+                        "where a.user.userID = :userId and a.apiPath = :path", ProviderApi::class.java)
         return query.setParameter("userId", userId).setParameter("path", path).resultList?.map { api ->
             em.detach(api)
             api.user = null
@@ -42,14 +44,17 @@ open class ApiDaoImpl(
         val logger = Logger.getLogger(ApiDaoImpl::class.java.name)
     }
     override fun getUserApiList(userId: Long): List<ProviderApi> {
-        val user = em.find(ProviderUser::class.java, userId)
-        val apis = user.providerApis.map { api ->
+        //val user = em.find(ProviderUser::class.java, userId)
+        //val apis = user.providerApis.map { api ->
+            //ProviderApi(api.id, null, api.apiPath, api.apiName, api.conditionJs, api.responseJson, mutableListOf())
+        //}
+        val query = em.createQuery(
+                "select a from ProviderApi a " +
+                        "where a.user.id = :id " +
+                        "order by a.apiPath", ProviderApi::class.java)
+        val apis = query.setParameter("id", userId).resultList.map { api ->
             ProviderApi(api.id, null, api.apiPath, api.apiName, api.conditionJs, api.responseJson, mutableListOf())
         }
-        //val query = em.createQuery("select a from ProviderApi a where a.providerUser.id = :id", ProviderApi::class.java)
-        //val apis = query.setParameter("id", userId).resultList
-
-        logger.info("apis.size = ${apis?.size}")
 
         return apis?: listOf()
     }

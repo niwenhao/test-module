@@ -217,7 +217,9 @@ var ApiNewPane = /** @class */ (function (_super) {
     ApiNewPane.prototype.save = function () {
         var responseData = {
             status: parseInt(this.state.status),
-            headers: this.state.headers.split(/\n/).map(function (u) {
+            headers: this.state.headers.split(/\n/).filter(function (u) {
+                return u.match(/^.+:.+$/) != null;
+            }).map(function (u) {
                 var index = u.indexOf(":");
                 return {
                     name: u.substring(0, index),
@@ -308,7 +310,9 @@ var ApiEditPane = /** @class */ (function (_super) {
     ApiEditPane.prototype.save = function () {
         var responseData = {
             status: parseInt(this.state.status),
-            headers: this.state.headers.split(/\n/).map(function (u) {
+            headers: this.state.headers.split(/\n/).filter(function (u) {
+                return u.match(/^.+:.+$/) != null;
+            }).map(function (u) {
                 var index = u.indexOf(":");
                 return {
                     name: u.substring(0, index),
@@ -392,12 +396,14 @@ var ApiMgr = /** @class */ (function (_super) {
         var _this = this;
         var client = new entities_1.ClientModel();
         client.fetch({
-            success: function () { return _this.setState({ client: client }); }
+            success: function () { return _this.setState({ client: client }); },
+            error: entities_1.errorHandler("クライアント定義取得が失敗しました。原因は以下です。\n")
         });
         var user = new entities_1.UserModel();
         user.url = function () { return "/api/users/" + _this.props.match.params.uid; };
         user.fetch({
-            success: function () { return _this.setState({ user: user }); }
+            success: function () { return _this.setState({ user: user }); },
+            error: entities_1.errorHandler("ユーザ取得が失敗しました。原因は以下です。\n")
         });
         this.refreshApiList();
     };
@@ -411,7 +417,8 @@ var ApiMgr = /** @class */ (function (_super) {
             success: function () { return _this.setState({
                 apis: apis,
                 action: ApiMgrAction.NONE
-            }); }
+            }); },
+            error: entities_1.errorHandler("API一覧取得が失敗しました。原因は以下です。\n")
         });
     };
     ApiMgr.prototype.appendApi = function () {
@@ -426,7 +433,7 @@ var ApiMgr = /** @class */ (function (_super) {
     ApiMgr.prototype.showHistory = function (api) {
         this.props.history.push(this.props.match.url + "/" + api.id + "/history");
     };
-    ApiMgr.prototype.createUser = function (path, name, con, res) {
+    ApiMgr.prototype.createApi = function (path, name, con, res) {
         var _this = this;
         var props = {
             apiPath: path,
@@ -435,20 +442,23 @@ var ApiMgr = /** @class */ (function (_super) {
             responseJson: res
         };
         this.state.apis.create(props, {
-            success: function () { return _this.refreshApiList(); }
+            success: function () { return _this.refreshApiList(); },
+            error: entities_1.errorHandler("作成処理が失敗しました。原因は以下です。\n")
         });
     };
     ApiMgr.prototype.deleteApi = function (api) {
         var _this = this;
         var a = this.state.apis.get(api.id);
         a.destroy({
-            success: function () { return _this.refreshApiList(); }
+            success: function () { return _this.refreshApiList(); },
+            error: entities_1.errorHandler("削除処理が失敗しました。原因は以下です。\n")
         });
     };
     ApiMgr.prototype.updateApi = function (api) {
         var _this = this;
         api.save(null, {
-            success: function () { return _this.refreshApiList(); }
+            success: function () { return _this.refreshApiList(); },
+            error: entities_1.errorHandler("保存処理は失敗しました。原因は以下です。\n")
         });
     };
     ApiMgr.prototype.clearHistory = function (api) {
@@ -486,7 +496,7 @@ var ApiMgr = /** @class */ (function (_super) {
         var SwitchApiPane = function (self) {
             switch (self.state.action) {
                 case ApiMgrAction.NONE: return React.createElement("div", null);
-                case ApiMgrAction.NEW: return React.createElement(ApiNewPane, { onSave: function (path, name, con, res) { return self.createUser(path, name, con, res); }, onCancel: function () { return self.cancel(); } });
+                case ApiMgrAction.NEW: return React.createElement(ApiNewPane, { onSave: function (path, name, con, res) { return self.createApi(path, name, con, res); }, onCancel: function () { return self.cancel(); } });
                 case ApiMgrAction.EDIT: return React.createElement(ApiEditPane, { api: self.state.currentApi, onCancel: function () { return self.cancel(); }, onSave: function (api) { return self.updateApi(api); }, onClearHistory: function (api) { return self.clearHistory(api); }, onDelete: function (api) { return self.deleteApi(api); } });
             }
         };
@@ -769,6 +779,14 @@ var ConfigCollection = /** @class */ (function (_super) {
     return ConfigCollection;
 }(Backbone.Collection));
 exports.ConfigCollection = ConfigCollection;
+function errorHandler(prefix, postfix) {
+    if (prefix === void 0) { prefix = ""; }
+    if (postfix === void 0) { postfix = ""; }
+    return function (model, xhr, options) {
+        alert("" + prefix + xhr.responseJSON.message + postfix);
+    };
+}
+exports.errorHandler = errorHandler;
 
 },{"backbone":8}],4:[function(require,module,exports){
 "use strict";
@@ -927,13 +945,15 @@ var ConfigMgr = /** @class */ (function (_super) {
     };
     ConfigMgr.prototype.doRefresh = function () {
         var _this = this;
+        console.log("doRefresh");
         var c = new entities_1.ConfigCollection();
         c.fetch({
             success: function () { return _this.setState({
                 configurations: c,
                 current: null,
                 action: ACTION.NONE
-            }); }
+            }); },
+            error: entities_1.errorHandler("設定一覧取得が失敗しました。原因は以下です。\n")
         });
     };
     ConfigMgr.prototype.doCreate = function (name, value) {
@@ -942,19 +962,26 @@ var ConfigMgr = /** @class */ (function (_super) {
             name: name,
             value: value
         }, {
-            success: function () { return _this.doRefresh(); }
+            success: function () { return _this.doRefresh(); },
+            error: entities_1.errorHandler("保存処理は失敗しました。原因は以下です。\n")
         });
     };
     ConfigMgr.prototype.doDelete = function (conf) {
         var _this = this;
         var c = this.state.configurations.get(conf.id);
         //this.state.configurations!.remove(c)
-        c.destroy({ success: function () { return _this.doRefresh(); } });
+        c.destroy({
+            success: function () { return _this.doRefresh(); },
+            error: entities_1.errorHandler("削除処理は失敗しました。原因は以下です。\n")
+        });
     };
     ConfigMgr.prototype.doSave = function (conf) {
         var _this = this;
         console.log("c => " + conf.name);
-        conf.save({ success: function () { return _this.doRefresh(); } });
+        conf.save(null, {
+            success: function () { return _this.doRefresh(); },
+            error: entities_1.errorHandler("保存処理は失敗しました。原因は以下です。\n")
+        });
     };
     ConfigMgr.prototype.render = function () {
         var _this = this;
@@ -1039,17 +1066,20 @@ var HistMgr = /** @class */ (function (_super) {
         var _this = this;
         var cl = new entities_1.ClientModel();
         cl.fetch({
-            success: function () { return _this.setState({ client: cl }); }
+            success: function () { return _this.setState({ client: cl }); },
+            error: entities_1.errorHandler("クライアント定義取得が失敗しました。原因は以下です。\n")
         });
         var u = new entities_1.UserModel();
         u.url = function () { return "/api/users/" + _this.userId; };
         u.fetch({
-            success: function () { return _this.setState({ user: u }); }
+            success: function () { return _this.setState({ user: u }); },
+            error: entities_1.errorHandler("ユーザ取得が失敗しました。原因は以下です。\n")
         });
         var a = new entities_1.ApiModel();
         a.url = function () { return "/api/users/" + _this.userId + "/apis/" + _this.apiId; };
         a.fetch({
-            success: function () { return _this.setState({ api: a }); }
+            success: function () { return _this.setState({ api: a }); },
+            error: entities_1.errorHandler("API取得が失敗しました。原因は以下です。\n")
         });
         this.refresh();
     };
@@ -1057,17 +1087,21 @@ var HistMgr = /** @class */ (function (_super) {
         var _this = this;
         var hc = new entities_1.HistoryCollection(this.apiId);
         hc.fetch({
-            success: function () { return _this.setState({ historyList: hc, currentHistory: null }); }
+            success: function () { return _this.setState({ historyList: hc, currentHistory: null }); },
+            error: entities_1.errorHandler("一覧取得が失敗しました。原因は以下です。\n")
         });
     };
     HistMgr.prototype.doDelete = function (hist) {
         var _this = this;
         var h = this.state.historyList.get(hist.id);
         var self = this;
-        h.destroy({ success: function () {
+        h.destroy({
+            success: function () {
                 _this.setState({ currentHistory: null });
                 _this.refresh();
-            } });
+            },
+            error: entities_1.errorHandler("削除処理が失敗しました。原因は以下です。\n")
+        });
     };
     HistMgr.prototype.toSelect = function (hist) {
         this.setState({ currentHistory: hist });
@@ -1109,7 +1143,7 @@ var HistMgr = /** @class */ (function (_super) {
                                             return (React.createElement("tr", { key: h.id },
                                                 React.createElement("td", { id: "select_column" },
                                                     React.createElement("input", { type: "radio", checked: id == h.id, value: h.id, onClick: function () { return self.toSelect(h); } })),
-                                                React.createElement("td", { id: "ts_column" }, dt.toLocaleTimeString()),
+                                                React.createElement("td", { id: "ts_column" }, dt.toLocaleDateString() + " " + dt.toLocaleTimeString()),
                                                 React.createElement("td", { id: "status_column" }, function (h) {
                                                     var resp = JSON.parse(h.responseJson);
                                                     return React.createElement("span", null, resp.status);
@@ -1126,7 +1160,7 @@ var HistMgr = /** @class */ (function (_super) {
                                         React.createElement("tbody", null,
                                             React.createElement("tr", null,
                                                 React.createElement("td", { colSpan: 2, id: "label" }, "\u6642\u523B"),
-                                                React.createElement("td", { id: "value" }, dat.toLocaleTimeString())),
+                                                React.createElement("td", { id: "value" }, dat.toLocaleDateString() + " " + dat.toLocaleTimeString())),
                                             React.createElement("tr", null,
                                                 React.createElement("td", { rowSpan: 3, id: "dlabel" }, "\u30EA\u30AF\u30A8\u30B9\u30C8"),
                                                 React.createElement("td", { id: "label" }, "\u30E1\u30BD\u30C3\u30C9"),
@@ -1248,7 +1282,9 @@ var UserEditor = /** @class */ (function (_super) {
         this.props.user.save(null, { success: function () {
                 console.log("success to update usermodel");
                 _this.props.onUpdate();
-            } });
+            },
+            error: entities_1.errorHandler("保存処理は失敗しました。原因は以下です。\n")
+        });
     };
     UserEditor.prototype.componentWillReceiveProps = function (props, nextContext) {
         this.setState({
@@ -1361,7 +1397,8 @@ var UserMgr = /** @class */ (function (_super) {
         client.fetch({
             success: function () {
                 _this.setState({ client: client.clientName + "(" + client.clientKey + ")" });
-            }
+            },
+            error: entities_1.errorHandler("クライアント定義取得が失敗しました。原因は以下です。\n")
         });
     };
     UserMgr.prototype.logout = function () {
@@ -1372,7 +1409,8 @@ var UserMgr = /** @class */ (function (_super) {
         users.fetch({
             success: function () {
                 _this.setState({ users: users, action: UserMgrAction.NONE });
-            }
+            },
+            error: entities_1.errorHandler("ユーザ一覧取得が失敗しました。原因は以下です。\n")
         });
     };
     UserMgr.prototype.newUser = function () {
@@ -1388,14 +1426,16 @@ var UserMgr = /** @class */ (function (_super) {
         this.state.users.create(u, {
             success: function () {
                 _this.refreshUserList();
-            }
+            },
+            error: entities_1.errorHandler("ユーザ作成が失敗しました。原因は以下です。\n")
         });
     };
     UserMgr.prototype.removeUser = function (user) {
         var _this = this;
         var u = this.state.users.get(user.id);
         u.destroy({
-            success: function () { return _this.refreshUserList(); }
+            success: function () { return _this.refreshUserList(); },
+            error: entities_1.errorHandler("ユーザ削除が失敗しました。原因は以下です。\n")
         });
     };
     UserMgr.prototype.clearUserHistory = function (user) {

@@ -43,7 +43,7 @@ open class HistoryDaoImpl(
     }
 
     override fun listByApiId(apiId: Long): List<ProviderApiHist> {
-        val query = em.createQuery("select h from ProviderApiHist h where h.api.id = :id", ProviderApiHist::class.java)
+        val query = em.createQuery("select h from ProviderApiHist h where h.api.id = :id order by h.accessTime desc", ProviderApiHist::class.java)
         return query.setParameter("id", apiId).resultList?.map(){ hist ->
             em.detach(hist)
             hist.api = null

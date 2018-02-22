@@ -31,7 +31,7 @@ open class ConfigDaoImpl(
         val em: EntityManager
 ): ConfigDao {
     override fun list(): List<ConfigEntity> {
-        return em.createQuery("select c from ProviderConfig c", ProviderConfig::class.java).resultList
+        return em.createQuery("select c from ProviderConfig c order by c.name", ProviderConfig::class.java).resultList
                 .map { c ->
                     ConfigEntity(c.id, c.name, c.value ?: c.largeValue)
                 }

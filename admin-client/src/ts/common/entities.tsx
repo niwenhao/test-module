@@ -206,3 +206,9 @@ export type ResponseData = {
       }[],
       body: string
     }
+
+export function errorHandler(prefix:string = "", postfix:string = "") {
+  return function(model: any, xhr: any, options: any) {
+    alert(`${prefix}${xhr.responseJSON.message}${postfix}`)
+  }
+}

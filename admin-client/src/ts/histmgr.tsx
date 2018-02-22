@@ -1,7 +1,7 @@
 import * as React from "react"
 import * as Backbone from 'backbone'
 
-import { ClientModel ,UserModel, ApiModel, HistoryModel, HistoryCollection, RequestData, ResponseData } from './common/entities'
+import { ClientModel ,UserModel, ApiModel, HistoryModel, HistoryCollection, RequestData, ResponseData, errorHandler } from './common/entities'
 import { BrowserRouter, Route, Link, RouteComponentProps } from "react-router-dom"
 
 interface HistMgrState {
@@ -33,19 +33,22 @@ export class HistMgr extends React.Component<RouteComponentProps<any>, HistMgrSt
   componentDidMount() {
     let cl = new ClientModel()
     cl.fetch({
-      success: () => this.setState({ client: cl })
+      success: () => this.setState({ client: cl }),
+      error: errorHandler("クライアント定義取得が失敗しました。原因は以下です。\n")
     })
 
     let u = new UserModel()
     u.url = () => `/api/users/${this.userId}`
     u.fetch({
-      success: () => this.setState({ user: u})
+      success: () => this.setState({ user: u}),
+      error: errorHandler("ユーザ取得が失敗しました。原因は以下です。\n")
     })
 
     let a = new ApiModel()
     a.url = () => `/api/users/${this.userId}/apis/${this.apiId}`
     a.fetch({
-      success: () => this.setState({api: a})
+      success: () => this.setState({api: a}),
+      error: errorHandler("API取得が失敗しました。原因は以下です。\n")
     })
 
     this.refresh()
@@ -54,17 +57,21 @@ export class HistMgr extends React.Component<RouteComponentProps<any>, HistMgrSt
   refresh() {
    let hc = new HistoryCollection(this.apiId)
     hc.fetch({
-      success: () => this.setState({historyList: hc, currentHistory: null})
+      success: () => this.setState({historyList: hc, currentHistory: null}),
+      error: errorHandler("一覧取得が失敗しました。原因は以下です。\n")
     })
   }
 
   doDelete(hist: HistoryModel) {
     let h = this.state.historyList!.get(hist.id)
     let self = this
-    h.destroy({ success: () => {
-      this.setState({currentHistory: null})
-      this.refresh()
-    }})
+    h.destroy({
+      success: () => {
+        this.setState({currentHistory: null})
+        this.refresh()
+      },
+      error: errorHandler("削除処理が失敗しました。原因は以下です。\n")
+    })
   }
 
   toSelect(hist: HistoryModel) {
@@ -123,7 +130,7 @@ export class HistMgr extends React.Component<RouteComponentProps<any>, HistMgrSt
                           <td id="select_column">
                             <input type="radio" checked={id == h.id} value={h.id} onClick={() => self.toSelect(h)}/>
                           </td>
-                          <td id="ts_column">{dt.toLocaleTimeString()}</td>
+                          <td id="ts_column">{`${dt.toLocaleDateString()} ${dt.toLocaleTimeString()}`}</td>
                           <td id="status_column">{function(h:HistoryModel){
                             let resp = JSON.parse(h.responseJson)
                             return <span>{resp.status}</span>
@@ -146,7 +153,7 @@ export class HistMgr extends React.Component<RouteComponentProps<any>, HistMgrSt
                         <table id="input_pane"><tbody>
                           <tr>
                             <td colSpan={2} id="label">時刻</td>
-                            <td id="value">{dat.toLocaleTimeString()}</td>
+                            <td id="value">{`${dat.toLocaleDateString()} ${dat.toLocaleTimeString()}`}</td>
                           </tr>
                           <tr>
                             <td rowSpan={3} id="dlabel">リクエスト</td>

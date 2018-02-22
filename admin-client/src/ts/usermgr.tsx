@@ -2,7 +2,7 @@ import * as React from "react"
 import { BrowserRouter as Router, Route, Link, Redirect } from "react-router-dom"
 import { RouteComponentProps } from 'react-router'
 
-import { User, UserModel, UserCollection, ClientModel } from './common/entities'
+import { User, UserModel, UserCollection, ClientModel, errorHandler } from './common/entities'
 import * as JQuery from "jquery"
 
 interface UserEditorState {
@@ -43,9 +43,11 @@ class UserEditor extends React.Component<UserEditorProps, UserEditorState> {
     this.props.user.password = this.state.password
 
     this.props.user.save(null, { success: () => {
-      console.log(`success to update usermodel`)
-      this.props.onUpdate()
-    }})
+        console.log(`success to update usermodel`)
+        this.props.onUpdate()
+      },
+      error: errorHandler("保存処理は失敗しました。原因は以下です。\n")
+    })
   }
 
   componentWillReceiveProps(props: UserEditorProps, nextContext: any) {
@@ -193,7 +195,8 @@ export class UserMgr
     client.fetch({
       success: () => {
         this.setState({ client: `${client.clientName}(${client.clientKey})`})
-      }
+      },
+      error: errorHandler("クライアント定義取得が失敗しました。原因は以下です。\n")
     })
   }
 
@@ -206,7 +209,8 @@ export class UserMgr
     users.fetch({
       success: () => {
         this.setState({users: users, action: UserMgrAction.NONE})
-      }
+      },
+      error: errorHandler("ユーザ一覧取得が失敗しました。原因は以下です。\n")
     })
   }
 
@@ -224,14 +228,16 @@ export class UserMgr
     this.state.users!.create(u, {
       success: () => {
         this.refreshUserList()
-      }
+      },
+      error: errorHandler("ユーザ作成が失敗しました。原因は以下です。\n")
     })
   }
 
   removeUser(user:UserModel) {
     let u = this.state.users!.get(user.id)
     u.destroy({
-      success: () => this.refreshUserList()
+      success: () => this.refreshUserList(),
+      error: errorHandler("ユーザ削除が失敗しました。原因は以下です。\n")
     })
   }
 

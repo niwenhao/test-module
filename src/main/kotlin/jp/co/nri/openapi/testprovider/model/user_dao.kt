@@ -27,7 +27,9 @@ open class UserDaoImpl(
         @PersistenceContext
         var em: EntityManager) : UserDao {
     override fun login(clientKey: String, userId: String, password: String): ProviderUser? {
-        val query = em.createQuery("select u from ProviderUser u where clientKey = :clientKey and userID = :userId and password = :password",
+        val query = em.createQuery(
+                "select u from ProviderUser u " +
+                "where clientKey = :clientKey and userID = :userId and password = :password ",
                 ProviderUser::class.java)
                 .setParameter("clientKey", clientKey)
                 .setParameter("userId", userId)
@@ -37,7 +39,10 @@ open class UserDaoImpl(
     }
 
     override fun list(clientKey: String): List<ProviderUser> {
-        val query = em.createQuery("select c from ProviderUser c where clientKey = :clientKey", ProviderUser::class.java)
+        val query = em.createQuery(
+                "select c from ProviderUser c " +
+                        "where clientKey = :clientKey " +
+                        "order by userID", ProviderUser::class.java)
         return query.setParameter("clientKey", clientKey).resultList.map { u ->
             ProviderUser(u.id, u.clientKey, u.userID, u.userName, u.password, mutableListOf())
         }

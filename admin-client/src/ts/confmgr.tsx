@@ -1,6 +1,6 @@
 import * as React from "react"
 import { BrowserRouter, Route, Link, RouteComponentProps } from "react-router-dom"
-import { Config, ConfigModel, ConfigCollection  } from './common/entities'
+import { Config, ConfigModel, ConfigCollection, errorHandler } from './common/entities'
 
 namespace create {
   interface CreateProps {
@@ -171,13 +171,15 @@ export class ConfigMgr extends React.Component<RouteComponentProps<any>, ConfigM
   }
 
   doRefresh() {
+    console.log("doRefresh")
     let c = new ConfigCollection()
     c.fetch({
       success: () => this.setState({
         configurations: c,
         current: null,
         action: ACTION.NONE
-      })
+      }),
+      error: errorHandler("設定一覧取得が失敗しました。原因は以下です。\n")
     })
   }
 
@@ -186,19 +188,27 @@ export class ConfigMgr extends React.Component<RouteComponentProps<any>, ConfigM
       name: name,
       value: value
     }, {
-      success: () => this.doRefresh()
+      success: () => this.doRefresh(),
+      error: errorHandler("保存処理は失敗しました。原因は以下です。\n")
     })
   }
 
   doDelete(conf:ConfigModel) {
     let c = this.state.configurations!.get(conf.id)
     //this.state.configurations!.remove(c)
-    c.destroy({ success: () => this.doRefresh() })
+    c.destroy({ 
+      success: () => this.doRefresh(),
+      error: errorHandler("削除処理は失敗しました。原因は以下です。\n")
+    })
   }
 
   doSave(conf:ConfigModel) {
     console.log(`c => ${conf.name}`)
-    conf.save({ success: () => this.doRefresh() })
+    conf.save(null, 
+      { 
+        success: () => this.doRefresh(),
+        error: errorHandler("保存処理は失敗しました。原因は以下です。\n")
+      })
   }
 
   render() {

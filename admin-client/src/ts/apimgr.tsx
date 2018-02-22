@@ -1,7 +1,7 @@
 import * as React from "react"
 import * as JQuery from "jquery"
 import { BrowserRouter, Route, Link, RouteComponentProps } from "react-router-dom"
-import { ClientModel, UserModel, Api, ApiModel, ApiCollection, RequestData, ResponseData } from './common/entities'
+import { ClientModel, UserModel, Api, ApiModel, ApiCollection, RequestData, ResponseData, errorHandler } from './common/entities'
 
 interface ApiNewState {
   apiPath: string
@@ -31,7 +31,9 @@ class ApiNewPane extends React.Component<ApiNewProps, ApiNewState> {
   save() {
     let responseData : ResponseData = {
       status: parseInt(this.state.status),
-      headers: this.state.headers.split(/\n/).map(function(u: string) {
+      headers: this.state.headers.split(/\n/).filter(function(u) {
+        return u.match(/^.+:.+$/) != null
+      }).map(function(u: string) {
         let index = u.indexOf(":")
         return {
           name: u.substring(0, index),
@@ -142,7 +144,9 @@ class ApiEditPane extends React.Component<ApiEditProps, ApiEditState> {
   save() {
     let responseData : ResponseData = {
       status: parseInt(this.state.status),
-      headers: this.state.headers.split(/\n/).map(function(u: string) {
+      headers: this.state.headers.split(/\n/).filter(function(u) {
+        return u.match(/^.+:.+$/) != null
+      }).map(function(u: string) {
         let index = u.indexOf(":")
         return {
           name: u.substring(0, index),
@@ -231,13 +235,15 @@ export class ApiMgr extends React.Component<RouteComponentProps<ApiMgrRoutParm>,
   componentDidMount() {
     let client = new ClientModel()
     client.fetch({
-      success: () => this.setState({ client: client})
+      success: () => this.setState({ client: client}),
+      error: errorHandler("クライアント定義取得が失敗しました。原因は以下です。\n")
     })
 
     let user = new UserModel()
     user.url = () => `/api/users/${this.props.match.params.uid}`
     user.fetch({
-      success: () => this.setState({user: user})
+      success: () => this.setState({user: user}),
+      error: errorHandler("ユーザ取得が失敗しました。原因は以下です。\n")
     })
 
     this.refreshApiList()
@@ -253,7 +259,8 @@ export class ApiMgr extends React.Component<RouteComponentProps<ApiMgrRoutParm>,
       success: () => this.setState({
         apis: apis,
         action: ApiMgrAction.NONE
-      })
+      }),
+      error: errorHandler("API一覧取得が失敗しました。原因は以下です。\n")
     })
   }
 
@@ -272,7 +279,7 @@ export class ApiMgr extends React.Component<RouteComponentProps<ApiMgrRoutParm>,
     this.props.history.push(`${this.props.match.url}/${api.id}/history`)
   }
 
-  createUser(path: string, name: string, con: string, res: string) {
+  createApi(path: string, name: string, con: string, res: string) {
     let props: Api = {
       apiPath: path,
       apiName: name,
@@ -280,19 +287,22 @@ export class ApiMgr extends React.Component<RouteComponentProps<ApiMgrRoutParm>,
       responseJson: res
     }
     this.state.apis!.create(props, {
-      success: () => this.refreshApiList()
+      success: () => this.refreshApiList(),
+      error: errorHandler("作成処理が失敗しました。原因は以下です。\n")
     })
   }
 
   deleteApi(api: ApiModel) {
     let a = this.state.apis!.get(api.id)
     a.destroy({
-      success: () => this.refreshApiList()
+      success: () => this.refreshApiList(),
+      error: errorHandler("削除処理が失敗しました。原因は以下です。\n")
     })
   }
   updateApi(api: ApiModel) {
     api.save(null, {
-      success: () => this.refreshApiList()
+      success: () => this.refreshApiList(),
+      error: errorHandler("保存処理は失敗しました。原因は以下です。\n")
     })
   }
 
@@ -340,7 +350,7 @@ export class ApiMgr extends React.Component<RouteComponentProps<ApiMgrRoutParm>,
     const SwitchApiPane = function(self: ApiMgr){
       switch(self.state.action) {
         case ApiMgrAction.NONE: return <div/>
-        case ApiMgrAction.NEW: return <ApiNewPane onSave={(path, name, con, res) => self.createUser(path, name, con, res)}
+        case ApiMgrAction.NEW: return <ApiNewPane onSave={(path, name, con, res) => self.createApi(path, name, con, res)}
                                                   onCancel={()=>self.cancel()}/>
         case ApiMgrAction.EDIT: return <ApiEditPane api={self.state.currentApi!} 
                                                     onCancel={() => self.cancel()}
