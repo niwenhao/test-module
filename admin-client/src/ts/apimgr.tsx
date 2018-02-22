@@ -53,8 +53,7 @@ class ApiNewPane extends React.Component<ApiNewProps, ApiNewState> {
   render(): React.ReactNode {
     return (
       <div id="detail_pane">
-        <h2>API追加</h2>
-        <hr/>
+        <div className="title_bar">API追加</div>
         <table id="input_pane">
           <tr>
             <td id="label"><label>PATH</label></td>
@@ -171,7 +170,7 @@ class ApiEditPane extends React.Component<ApiEditProps, ApiEditState> {
   render(): React.ReactNode {
     return (
       <div id="detail_pane">
-        <h1>API変更</h1>
+        <div className="title_bar">API変更</div>
         <table id="input_pane">
           <tr>
             <td id="label"><label>PATH</label></td>
@@ -329,7 +328,6 @@ export class ApiMgr extends React.Component<RouteComponentProps<ApiMgrRoutParm>,
 
   render(): React.ReactNode {
     const ShowApi = (api: ApiModel) => {
-      console.log(`api = ${JSON.stringify(api)}`)
       return (
         <tr key={api.id}>
           <td id="select_column">
@@ -367,7 +365,7 @@ export class ApiMgr extends React.Component<RouteComponentProps<ApiMgrRoutParm>,
           <hr/>
           <div id="button_area">
             <button onClick={() => this.back()}>ユーザメンテへ</button>
-            <button onClick={ () => this.refreshApiList() }>更新</button>
+            <button onClick={ () => this.refreshApiList() }>再取得</button>
             <button onClick={ () => this.appendApi() }>追加</button>
             <button onClick={() => window.open("/test-data-manager/index", "_self")}>ログアウト</button>
           </div>

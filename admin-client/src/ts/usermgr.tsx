@@ -61,8 +61,7 @@ class UserEditor extends React.Component<UserEditorProps, UserEditorState> {
   render(): React.ReactNode {
     return (
       <div id="detail_pane">
-        <h2>ユーザ編集</h2>
-        <hr/>
+        <div className="title_bar">ユーザ編集</div>
         <table id="input_pane"><tbody>
           <tr>
             <td id="label"><label>ユーザID</label></td>
@@ -77,7 +76,7 @@ class UserEditor extends React.Component<UserEditorProps, UserEditorState> {
             <td id="value"><input type="password" value={this.state.password} onChange = {(e:any) => this.setState({password: e.target.value})} /></td>
           </tr>
           <tr><td colSpan={2} id="button_area">
-            <button onClick={() => this.clearHist()}>履歴クリア</button>
+            <button onClick={() => this.clearHist()}>履歴削除</button>
             <button onClick={() => this.remove()}>削除</button>
             <button onClick={() => this.update()}>保存</button>
             <button onClick={this.props.onCancel}>キャンセル</button>
@@ -288,8 +287,7 @@ export class UserMgr
       var password = ""
       return (
         <div id="detail_pane">
-          <h2>ユーザ編集</h2>
-          <hr/>
+          <div className="title_bar">ユーザ追加</div>
           <table id="input_pane"><tbody>
             <tr>
               <td id="label"><label>ユーザID</label></td>
@@ -321,8 +319,8 @@ export class UserMgr
           <hr/>
           <div id="button_area">
             <button onClick={() => this.props.history.goBack()}>メニューへ</button>
-            <button type="button" onClick={ () => this.newUser() }>追加</button>
             <button type="button" onClick={ () => this.refreshUserList() }>再取得</button>
+            <button type="button" onClick={ () => this.newUser() }>追加</button>
             <button onClick={ () => this.clearAllHistory() }>全履歴削除</button>
             <button onClick={() => window.open("/test-data-manager/index", "_self")}>ログアウト</button>
           </div>

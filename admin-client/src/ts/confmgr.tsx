@@ -30,6 +30,7 @@ namespace create {
     render() {
       return (
         <div id="input_pane">
+          <div className="title_bar">設定値新規</div>
           <table><tbody>
             <tr>
               <td id="label"><label>キー</label></td>
@@ -98,6 +99,7 @@ namespace edit {
     render() {
       return (
         <div id="input_pane">
+          <div className="title_bar">設定値変更</div>
           <table><tbody>
             <tr>
               <td id="label"><label>キー</label></td>
@@ -225,17 +227,18 @@ export class ConfigMgr extends React.Component<RouteComponentProps<any>, ConfigM
     if (this.state.configurations) {
       return (
         <div id="confmgr">
-          <h1>設定値管理</h1>
+          <h1>設定値メンテナンス</h1>
           <hr/>
           <div id="button_area">
             <button onClick={()=>this.toMenu()}>メニューへ</button>
-            <button onClick={()=>this.toCreate()}>新規設定値</button>
             <button onClick={()=>this.doRefresh()}>再取得</button>
+            <button onClick={()=>this.toCreate()}>新規設定値</button>
+            <button onClick={() => window.open("/test-data-manager/index", "_self")}>ログアウト</button>
           </div>
           <table id="main_area"><tbody><tr>
             <td id="list_pane">
               <table><tbody>
-                <tr id="title">
+              <tr id="title">
                   <td id="select_column">選択</td>
                   <td id="key_column">キー</td>
                   <td id="value_column">値</td>

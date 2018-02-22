@@ -236,8 +236,7 @@ var ApiNewPane = /** @class */ (function (_super) {
     ApiNewPane.prototype.render = function () {
         var _this = this;
         return (React.createElement("div", { id: "detail_pane" },
-            React.createElement("h2", null, "API\u8FFD\u52A0"),
-            React.createElement("hr", null),
+            React.createElement("div", { className: "title_bar" }, "API\u8FFD\u52A0"),
             React.createElement("table", { id: "input_pane" },
                 React.createElement("tr", null,
                     React.createElement("td", { id: "label" },
@@ -333,7 +332,7 @@ var ApiEditPane = /** @class */ (function (_super) {
     ApiEditPane.prototype.render = function () {
         var _this = this;
         return (React.createElement("div", { id: "detail_pane" },
-            React.createElement("h1", null, "API\u5909\u66F4"),
+            React.createElement("div", { className: "title_bar" }, "API\u5909\u66F4"),
             React.createElement("table", { id: "input_pane" },
                 React.createElement("tr", null,
                     React.createElement("td", { id: "label" },
@@ -484,7 +483,6 @@ var ApiMgr = /** @class */ (function (_super) {
     ApiMgr.prototype.render = function () {
         var _this = this;
         var ShowApi = function (api) {
-            console.log("api = " + JSON.stringify(api));
             return (React.createElement("tr", { key: api.id },
                 React.createElement("td", { id: "select_column" },
                     React.createElement("input", { type: 'radio', checked: (_this.state.currentApi && _this.state.currentApi.id) == api.id, onClick: function () { return _this.selectApi(api); }, value: api.id })),
@@ -506,7 +504,7 @@ var ApiMgr = /** @class */ (function (_super) {
                 React.createElement("hr", null),
                 React.createElement("div", { id: "button_area" },
                     React.createElement("button", { onClick: function () { return _this.back(); } }, "\u30E6\u30FC\u30B6\u30E1\u30F3\u30C6\u3078"),
-                    React.createElement("button", { onClick: function () { return _this.refreshApiList(); } }, "\u66F4\u65B0"),
+                    React.createElement("button", { onClick: function () { return _this.refreshApiList(); } }, "\u518D\u53D6\u5F97"),
                     React.createElement("button", { onClick: function () { return _this.appendApi(); } }, "\u8FFD\u52A0"),
                     React.createElement("button", { onClick: function () { return window.open("/test-data-manager/index", "_self"); } }, "\u30ED\u30B0\u30A2\u30A6\u30C8")),
                 React.createElement("div", { id: "description" },
@@ -824,6 +822,7 @@ var create;
         CreatePane.prototype.render = function () {
             var _this = this;
             return (React.createElement("div", { id: "input_pane" },
+                React.createElement("div", { className: "title_bar" }, "\u8A2D\u5B9A\u5024\u65B0\u898F"),
                 React.createElement("table", null,
                     React.createElement("tbody", null,
                         React.createElement("tr", null,
@@ -879,6 +878,7 @@ var edit;
         EditPane.prototype.render = function () {
             var _this = this;
             return (React.createElement("div", { id: "input_pane" },
+                React.createElement("div", { className: "title_bar" }, "\u8A2D\u5B9A\u5024\u5909\u66F4"),
                 React.createElement("table", null,
                     React.createElement("tbody", null,
                         React.createElement("tr", null,
@@ -999,12 +999,13 @@ var ConfigMgr = /** @class */ (function (_super) {
         };
         if (this.state.configurations) {
             return (React.createElement("div", { id: "confmgr" },
-                React.createElement("h1", null, "\u8A2D\u5B9A\u5024\u7BA1\u7406"),
+                React.createElement("h1", null, "\u8A2D\u5B9A\u5024\u30E1\u30F3\u30C6\u30CA\u30F3\u30B9"),
                 React.createElement("hr", null),
                 React.createElement("div", { id: "button_area" },
                     React.createElement("button", { onClick: function () { return _this.toMenu(); } }, "\u30E1\u30CB\u30E5\u30FC\u3078"),
+                    React.createElement("button", { onClick: function () { return _this.doRefresh(); } }, "\u518D\u53D6\u5F97"),
                     React.createElement("button", { onClick: function () { return _this.toCreate(); } }, "\u65B0\u898F\u8A2D\u5B9A\u5024"),
-                    React.createElement("button", { onClick: function () { return _this.doRefresh(); } }, "\u518D\u53D6\u5F97")),
+                    React.createElement("button", { onClick: function () { return window.open("/test-data-manager/index", "_self"); } }, "\u30ED\u30B0\u30A2\u30A6\u30C8")),
                 React.createElement("table", { id: "main_area" },
                     React.createElement("tbody", null,
                         React.createElement("tr", null,
@@ -1154,8 +1155,7 @@ var HistMgr = /** @class */ (function (_super) {
                                 var req = JSON.parse(h.requestJson);
                                 var res = JSON.parse(h.responseJson);
                                 return (React.createElement("div", null,
-                                    React.createElement("h1", null, "\u8A73\u7D30"),
-                                    React.createElement("hr", null),
+                                    React.createElement("div", { className: "title_bar" }, "\u8A73\u7D30"),
                                     React.createElement("table", { id: "input_pane" },
                                         React.createElement("tbody", null,
                                             React.createElement("tr", null,
@@ -1296,8 +1296,7 @@ var UserEditor = /** @class */ (function (_super) {
     UserEditor.prototype.render = function () {
         var _this = this;
         return (React.createElement("div", { id: "detail_pane" },
-            React.createElement("h2", null, "\u30E6\u30FC\u30B6\u7DE8\u96C6"),
-            React.createElement("hr", null),
+            React.createElement("div", { className: "title_bar" }, "\u30E6\u30FC\u30B6\u7DE8\u96C6"),
             React.createElement("table", { id: "input_pane" },
                 React.createElement("tbody", null,
                     React.createElement("tr", null,
@@ -1317,7 +1316,7 @@ var UserEditor = /** @class */ (function (_super) {
                             React.createElement("input", { type: "password", value: this.state.password, onChange: function (e) { return _this.setState({ password: e.target.value }); } }))),
                     React.createElement("tr", null,
                         React.createElement("td", { colSpan: 2, id: "button_area" },
-                            React.createElement("button", { onClick: function () { return _this.clearHist(); } }, "\u5C65\u6B74\u30AF\u30EA\u30A2"),
+                            React.createElement("button", { onClick: function () { return _this.clearHist(); } }, "\u5C65\u6B74\u524A\u9664"),
                             React.createElement("button", { onClick: function () { return _this.remove(); } }, "\u524A\u9664"),
                             React.createElement("button", { onClick: function () { return _this.update(); } }, "\u4FDD\u5B58"),
                             React.createElement("button", { onClick: this.props.onCancel }, "\u30AD\u30E3\u30F3\u30BB\u30EB")))))));
@@ -1482,8 +1481,7 @@ var UserMgr = /** @class */ (function (_super) {
             var name = "";
             var password = "";
             return (React.createElement("div", { id: "detail_pane" },
-                React.createElement("h2", null, "\u30E6\u30FC\u30B6\u7DE8\u96C6"),
-                React.createElement("hr", null),
+                React.createElement("div", { className: "title_bar" }, "\u30E6\u30FC\u30B6\u8FFD\u52A0"),
                 React.createElement("table", { id: "input_pane" },
                     React.createElement("tbody", null,
                         React.createElement("tr", null,
@@ -1512,8 +1510,8 @@ var UserMgr = /** @class */ (function (_super) {
                 React.createElement("hr", null),
                 React.createElement("div", { id: "button_area" },
                     React.createElement("button", { onClick: function () { return _this.props.history.goBack(); } }, "\u30E1\u30CB\u30E5\u30FC\u3078"),
-                    React.createElement("button", { type: "button", onClick: function () { return _this.newUser(); } }, "\u8FFD\u52A0"),
                     React.createElement("button", { type: "button", onClick: function () { return _this.refreshUserList(); } }, "\u518D\u53D6\u5F97"),
+                    React.createElement("button", { type: "button", onClick: function () { return _this.newUser(); } }, "\u8FFD\u52A0"),
                     React.createElement("button", { onClick: function () { return _this.clearAllHistory(); } }, "\u5168\u5C65\u6B74\u524A\u9664"),
                     React.createElement("button", { onClick: function () { return window.open("/test-data-manager/index", "_self"); } }, "\u30ED\u30B0\u30A2\u30A6\u30C8")),
                 React.createElement("div", { id: "description" },

@@ -148,8 +148,7 @@ export class HistMgr extends React.Component<RouteComponentProps<any>, HistMgrSt
 
                     return (
                       <div>
-                        <h1>詳細</h1>
-                        <hr/>
+                        <div className="title_bar">詳細</div>
                         <table id="input_pane"><tbody>
                           <tr>
                             <td colSpan={2} id="label">時刻</td>
