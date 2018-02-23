@@ -180,6 +180,10 @@ export class HistMgr extends React.Component<RouteComponentProps<any>, HistMgrSt
                             <td id="label">ボディー</td>
                             <td id="value"><textarea value={res.body}/></td>
                           </tr>
+                          <tr>
+                            <td colSpan={2} id="label">Log</td>
+                            <td id="value"><textarea value={h.jslog}/></td>
+                          </tr>
                         </tbody></table>
                         <div id="button_area">
                           <button onClick={() => self.doDelete(self.state.currentHistory!)}>削除</button>

@@ -17,8 +17,12 @@ class TestDataManager(
 ) {
 
     @RequestMapping("/index")
-    fun index() {
-
+    fun index(
+            session: HttpSession
+    ) {
+        session.attributeNames.toList().forEach { n ->
+            session.removeAttribute(n)
+        }
     }
 
     @RequestMapping("/admin")

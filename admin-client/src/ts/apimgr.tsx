@@ -197,7 +197,7 @@ class ApiEditPane extends React.Component<ApiEditProps, ApiEditState> {
             <td id="value"><textarea onChange={(e) => this.setState({body: e.target.value})} value={this.state.body}></textarea></td>
           </tr>
         </table>
-        <div>
+        <div id="button_area">
           <button onClick={() => this.clearHistory()}>履歴削除</button>
           <button onClick={() => this.delete()}>削除</button>
           <button onClick={() => this.save()}>保存</button>

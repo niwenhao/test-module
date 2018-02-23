@@ -3,6 +3,8 @@ package jp.co.nri.openapi.testprovider.controller
 import com.fasterxml.jackson.databind.ObjectMapper
 import jp.co.nri.openapi.testprovider.Const
 import jp.co.nri.openapi.testprovider.model.*
+import java.io.ByteArrayOutputStream
+import java.io.PrintStream
 import java.net.URLDecoder
 import java.util.logging.Logger
 import javax.annotation.Resource
@@ -51,8 +53,16 @@ class ApiDispatcher(
 
                     val body = String(bodyByteArray, Charsets.UTF_8)
 
-                    val binding = SimpleBindings(mapOf("path" to req.requestURI, "query" to query, "body" to body, "header" to header, "log" to log))
+                    val bufStream = ByteArrayOutputStream()
+                    var bufWriter = PrintStream(bufStream, true, Charsets.UTF_8.name())
+                    bufWriter.println("============================== BY SETUP ==============================")
+
+                    val binding = SimpleBindings(mapOf("path" to req.requestURI, "query" to query, "body" to body, "header" to header, "log" to bufWriter))
+
                     val authTicket = jsEngine.eval(js, binding) as String
+
+                    bufWriter.flush()
+                    log.info(bufStream.toString(Charsets.UTF_8.name()))
 
                     val mapping = ObjectMapper()
                     val authData = mapping.readValue(URLDecoder.decode(authTicket, "UTF-8"), AuthorizeTicket::class.java)
@@ -60,10 +70,16 @@ class ApiDispatcher(
                     val apiList = apiDao?.getInvokedApiList(authData.userId ?: "", req.getAttribute(Const.CK_API_MATCH_PATH) as String) ?: listOf()
 
                     apiList.forEach { api ->
-                        val binding = SimpleBindings(mapOf("path" to req.requestURI, "query" to query, "body" to body, "header" to header, "log" to log))
+                        val binding = SimpleBindings(mapOf("path" to req.requestURI, "query" to query, "body" to body, "header" to header, "log" to bufWriter))
                         if (!processed) { //&& (api.conditionJs == null || jsEngine.eval(api.conditionJs, binding) as Boolean)) {
                             api.conditionJs?.let { js ->
+                                bufWriter.println("=============================== BY API ===============================")
+
                                 if (jsEngine.eval(js, binding) as Boolean) {
+
+                                    bufWriter.flush()
+                                    log.info(bufStream.toString(Charsets.UTF_8.name()))
+
                                     processed = true
 
                                     val responseData = mapping.readValue(api.responseJson, ApiResponse::class.java)
@@ -89,7 +105,7 @@ class ApiDispatcher(
 
                                     q.headers = qh.toTypedArray()
 
-                                    histDao?.addHistory(api.id ?: 0, q, responseData)
+                                    histDao?.addHistory(api.id ?: 0, q, responseData, bufStream.toString(Charsets.UTF_8.name()))
                                 }
                             }
                         }

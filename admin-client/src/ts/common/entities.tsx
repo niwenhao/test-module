@@ -145,6 +145,13 @@ export class HistoryModel extends Backbone.Model implements History {
   set responseJson(v: string) {
     this.set('responseJson', v)
   }
+
+  get jslog(): string {
+    return this.get('jslog')
+  }
+  set jslog(v: string) {
+    this.set('jslog', v)
+  }
 }
 
 export class HistoryCollection extends Backbone.Collection<HistoryModel> {

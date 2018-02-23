@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import javax.persistence.*
+import javax.validation.Valid
 
 @Entity
 @Table(name = "nri_test_config",
@@ -55,11 +56,22 @@ data class ProviderApi(
         var apiName: String? = null,
         @Column(length = 512 * 1024, columnDefinition = "LONG")
         var conditionJs: String? = null,
-        @Column(length = 512 * 1024, columnDefinition = "LONG")
+        @Lob
+        @Basic(fetch = FetchType.LAZY)
+        @Column
         var responseJson: String? = null,
         @OneToMany(targetEntity = ProviderApiHist::class, cascade = arrayOf(CascadeType.ALL), mappedBy = "api", fetch = FetchType.LAZY)
         var providerApiHists: MutableList<ProviderApiHist> = mutableListOf()
-)
+) {
+        @PrePersist
+        @PreUpdate
+        fun checkJs() {
+                val p = Regex("java\\.io|java\\.nio|java\\.lang|java\\.net")
+                if (p.find(conditionJs?:"") != null) {
+                        throw IllegalStateException("Dangerous javascirpt")
+                }
+        }
+}
 
 @Entity
 @Table(name = "nri_test_hist")
@@ -71,10 +83,19 @@ data class ProviderApiHist(
         var api: ProviderApi? = null,
         @Column
         var accessTime: Long? = null,
-        @Column(length = 512 * 1024, columnDefinition = "LONG")
+        @Lob
+        @Basic(fetch = FetchType.LAZY)
+        @Column
         var requestJson: String? = null,
-        @Column(length = 512 * 1024, columnDefinition = "LONG")
-        var responseJson: String? = null
+        @Lob
+        @Basic(fetch = FetchType.LAZY)
+        @Column
+        var responseJson: String? = null,
+
+        @Lob
+        @Basic(fetch = FetchType.LAZY)
+        @Column
+        var jslog: String? = null
 )
 
 interface ProviderApiHistRepository : JpaRepository<ProviderApiHist, Long> {

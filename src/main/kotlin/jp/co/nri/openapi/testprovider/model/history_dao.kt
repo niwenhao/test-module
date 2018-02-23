@@ -23,7 +23,7 @@ interface HistoryDao {
     fun removeByApiId(id: Long): RemoveHistoryResult
     fun removeByUserId(id: Long): RemoveHistoryResult
     fun removeByClientKey(clientKey: String): RemoveHistoryResult
-    fun addHistory(apiId:Long, req: ApiRequest, res: ApiResponse)
+    fun addHistory(apiId:Long, req: ApiRequest, res: ApiResponse, log: String)
 }
 
 @Repository
@@ -35,16 +35,21 @@ open class HistoryDaoImpl(
         val repo: ProviderApiHistRepository
 ): HistoryDao {
     @Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED)
-    override fun addHistory(apiId: Long, req: ApiRequest, res: ApiResponse) {
+    override fun addHistory(apiId: Long, req: ApiRequest, res: ApiResponse, log: String) {
         val mapping = ObjectMapper()
         val api = em.find(ProviderApi::class.java, apiId)
-        val hist = ProviderApiHist(null, api, System.currentTimeMillis(), mapping.writeValueAsString(req), mapping.writeValueAsString(res))
+        val hist = ProviderApiHist(null, api, System.currentTimeMillis(), mapping.writeValueAsString(req), mapping.writeValueAsString(res), log)
         em.persist(hist)
     }
 
     override fun listByApiId(apiId: Long): List<ProviderApiHist> {
         val query = em.createQuery("select h from ProviderApiHist h where h.api.id = :id order by h.accessTime desc", ProviderApiHist::class.java)
         return query.setParameter("id", apiId).resultList?.map(){ hist ->
+            var histSize = 0
+            listOf<Int>(hist.requestJson?.length?:0, hist.responseJson?.length?:0, hist.jslog?.length?:0).forEach { l ->
+                histSize += l
+            }
+            System.out.println("history size = ${histSize}")
             em.detach(hist)
             hist.api = null
             hist
