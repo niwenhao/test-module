@@ -239,7 +239,7 @@ export class ApiMgr extends React.Component<RouteComponentProps<ApiMgrRoutParm>,
     })
 
     let user = new UserModel()
-    user.url = () => `/api/users/${this.props.match.params.uid}`
+    user.url = () => `/test-data-manager/api/users/${this.props.match.params.uid}`
     user.fetch({
       success: () => this.setState({user: user}),
       error: errorHandler("ユーザ取得が失敗しました。原因は以下です。\n")
@@ -307,7 +307,7 @@ export class ApiMgr extends React.Component<RouteComponentProps<ApiMgrRoutParm>,
 
   clearHistory(api: ApiModel) {
     JQuery.ajax({
-      url: `/api/hist/api/${api.id}`,
+      url: `/test-data-manager/api/hist/api/${api.id}`,
       method: "DELETE",
       success: (data: {result: boolean, message: string}) => {
         if (data.result) {

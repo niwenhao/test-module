@@ -35,13 +35,13 @@ export class UserModel extends Backbone.Model implements User {
 }
 
 export class UserCollection extends Backbone.Collection<UserModel> {
-  url = "/api/users"
+  url = "/test-data-manager/api/users"
 
   model = UserModel
 }
 
 export class ClientModel extends Backbone.Model {
-  url = () => "/api/adminclient"
+  url = () => "/test-data-manager/api/adminclient"
 
   get clientKey(): string {
     return this.get('clientKey')
@@ -107,7 +107,7 @@ export class ApiCollection extends Backbone.Collection<ApiModel> {
     super()
   }
 
-  url = () => `/api/users/${this.idOfUser}/apis`
+  url = () => `/test-data-manager/api/users/${this.idOfUser}/apis`
   model = ApiModel
 }
 
@@ -152,7 +152,7 @@ export class HistoryCollection extends Backbone.Collection<HistoryModel> {
     super()
   }
 
-  url = () => `/api/hist/api/${this.apiId}`
+  url = () => `/test-data-manager/api/hist/api/${this.apiId}`
   model = HistoryModel
 }
 
@@ -185,7 +185,7 @@ export class ConfigModel extends Backbone.Model implements Config {
 
 export class ConfigCollection extends Backbone.Collection<ConfigModel> {
 
-  url = () => `/api/configurations`
+  url = () => `/test-data-manager/api/configurations`
   model = ConfigModel
 }
 

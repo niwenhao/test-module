@@ -242,7 +242,7 @@ export class UserMgr
 
   clearUserHistory(user: UserModel) {
     JQuery.ajax({
-      url: `/api/hist/user/${user.id}`,
+      url: `/test-data-manager/api/hist/user/${user.id}`,
       method: "DELETE",
       success: (data: {result: boolean, message: string}) => {
         if (data.result) {
@@ -263,7 +263,7 @@ export class UserMgr
 
   clearAllHistory() {
     JQuery.ajax({
-      url: "/api/hist/client",
+      url: "/test-data-manager/api/hist/client",
       method: "DELETE",
       success: (data: {result: boolean, message: string}) => {
         if (data.result) {

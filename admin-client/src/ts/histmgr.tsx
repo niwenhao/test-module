@@ -38,14 +38,14 @@ export class HistMgr extends React.Component<RouteComponentProps<any>, HistMgrSt
     })
 
     let u = new UserModel()
-    u.url = () => `/api/users/${this.userId}`
+    u.url = () => `/test-data-manager/api/users/${this.userId}`
     u.fetch({
       success: () => this.setState({ user: u}),
       error: errorHandler("ユーザ取得が失敗しました。原因は以下です。\n")
     })
 
     let a = new ApiModel()
-    a.url = () => `/api/users/${this.userId}/apis/${this.apiId}`
+    a.url = () => `/test-data-manager/api/users/${this.userId}/apis/${this.apiId}`
     a.fetch({
       success: () => this.setState({api: a}),
       error: errorHandler("API取得が失敗しました。原因は以下です。\n")

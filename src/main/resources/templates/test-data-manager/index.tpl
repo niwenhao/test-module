@@ -4,7 +4,7 @@ html(lang: 'ja'){
     head {
         meta("", charset: 'UTF-8')
         title("Test manager")
-        link("", rel: "stylesheet", type: "text/css", href: "/styles.css")
+        link("", rel: "stylesheet", type: "text/css", href: "/test-data-manager/cont/styles.css")
     }
     body {
         div(id: "index_pane") {

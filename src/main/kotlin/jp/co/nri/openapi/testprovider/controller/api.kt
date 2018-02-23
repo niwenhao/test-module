@@ -14,11 +14,11 @@ class ClientApiController(
         @Resource
         val clientDao: ClientDao
 ) {
-    @RequestMapping(path = arrayOf("/api/adminclient"), method = arrayOf(RequestMethod.GET))
+    @RequestMapping(path = arrayOf("/test-data-manager/api/adminclient"), method = arrayOf(RequestMethod.GET))
     fun currentClient(session: HttpSession): Client? {
         return session.getAttribute(Const.SK_CLIENT)?.let { c -> c as Client }
     }
-    @RequestMapping(path = arrayOf("/api/client/{clientKey}"), method = arrayOf(RequestMethod.GET))
+    @RequestMapping(path = arrayOf("/test-data-manager/api/client/{clientKey}"), method = arrayOf(RequestMethod.GET))
     fun currentClient(
             @PathVariable
             clientKey: String,
@@ -36,14 +36,14 @@ class UserServiceController(
         @Resource
         val userDao: UserDao
 ) {
-    @RequestMapping("/api/users", method = arrayOf(RequestMethod.GET))
+    @RequestMapping("/test-data-manager/api/users", method = arrayOf(RequestMethod.GET))
     fun list(session: HttpSession): List<ProviderUser>? {
         return (session.getAttribute(Const.SK_CLIENT) as Client?)?.let { client ->
             userDao.list(client.clientKey)
         }
     }
 
-    @RequestMapping("/api/users", method = arrayOf(RequestMethod.POST))
+    @RequestMapping("/test-data-manager/api/users", method = arrayOf(RequestMethod.POST))
     fun create(
             session: HttpSession,
             @RequestBody
@@ -57,7 +57,7 @@ class UserServiceController(
     }
 
 
-    @RequestMapping("/api/users/{id}", method = arrayOf(RequestMethod.PUT))
+    @RequestMapping("/test-data-manager/api/users/{id}", method = arrayOf(RequestMethod.PUT))
     fun update(
         session: HttpSession,
         @PathVariable
@@ -77,7 +77,7 @@ class UserServiceController(
         }
     }
 
-    @RequestMapping("/api/users/{id}", method = arrayOf(RequestMethod.GET))
+    @RequestMapping("/test-data-manager/api/users/{id}", method = arrayOf(RequestMethod.GET))
     fun userById(
             session: HttpSession,
             @PathVariable
@@ -88,7 +88,7 @@ class UserServiceController(
         }
     }
 
-    @RequestMapping("/api/users/{id}", method = arrayOf(RequestMethod.DELETE))
+    @RequestMapping("/test-data-manager/api/users/{id}", method = arrayOf(RequestMethod.DELETE))
     fun remove(
             session: HttpSession,
             @PathVariable
@@ -101,7 +101,7 @@ class UserServiceController(
 }
 
 @RestController
-@RequestMapping("/api/users/{userId}")
+@RequestMapping("/test-data-manager/api/users/{userId}")
 class ApiServiceController(
         val apiDao: ApiDao
 ) {
@@ -167,7 +167,7 @@ class ApiServiceController(
 
 //@RequestMapping("/api/users/{userId}/apis/{apiId}")
 @RestController
-@RequestMapping("/api/hist")
+@RequestMapping("/test-data-manager/api/hist")
 class HistoryServiceController(
         @Resource
         val histDao: HistoryDao
@@ -232,7 +232,7 @@ class ConfigServiceController(
         @Resource
         val configDao: ConfigDao
 ) {
-    @RequestMapping("/api/configurations", method = arrayOf(RequestMethod.GET))
+    @RequestMapping("/test-data-manager/api/configurations", method = arrayOf(RequestMethod.GET))
     fun list(
             session: HttpSession
     ): List<ConfigEntity> {
@@ -242,7 +242,7 @@ class ConfigServiceController(
         }?: listOf()
     }
 
-    @RequestMapping("/api/configurations", method = arrayOf(RequestMethod.POST))
+    @RequestMapping("/test-data-manager/api/configurations", method = arrayOf(RequestMethod.POST))
     fun create(
             session: HttpSession,
             @RequestBody
@@ -253,7 +253,7 @@ class ConfigServiceController(
         }
     }
 
-    @RequestMapping("/api/configurations/{configId}", method = arrayOf(RequestMethod.PUT))
+    @RequestMapping("/test-data-manager/api/configurations/{configId}", method = arrayOf(RequestMethod.PUT))
     fun update(
             session: HttpSession,
             @PathVariable
@@ -266,7 +266,7 @@ class ConfigServiceController(
         }
     }
 
-    @RequestMapping("/api/configurations/{configId}", method = arrayOf(RequestMethod.DELETE))
+    @RequestMapping("/test-data-manager/api/configurations/{configId}", method = arrayOf(RequestMethod.DELETE))
     fun delete(
             session: HttpSession,
             @PathVariable

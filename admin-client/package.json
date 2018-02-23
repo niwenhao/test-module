@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "deploy": "gulp && browserify midjs/main.js -o ../src/main/resources/static/admin.js && lessc src/css/styles.less > ../src/main/resources/static/styles.css && cd .. && gradle build"
+    "deploy": "gulp && browserify midjs/main.js -o ../src/main/resources/static/test-data-manager/cont/admin.js && lessc src/css/styles.less > ../src/main/resources/static/test-data-manager/cont/styles.css && cd .. && gradle build"
   },
   "author": "",
   "license": "ISC",
