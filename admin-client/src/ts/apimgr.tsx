@@ -29,21 +29,23 @@ class ApiNewPane extends React.Component<ApiNewProps, ApiNewState> {
   }
 
   save() {
-    let responseData : ResponseData = {
-      status: parseInt(this.state.status),
-      headers: this.state.headers.split(/\n/).filter(function(u) {
-        return u.match(/^.+:.+$/) != null
-      }).map(function(u: string) {
-        let index = u.indexOf(":")
-        return {
-          name: u.substring(0, index),
-          value: u.substring(index + 1).replace(/^ */, "")
-        }
-      }),
-      body: this.state.body
-    }
+    if (confirm("入力内容を保存しますか？")) {
+      let responseData : ResponseData = {
+        status: parseInt(this.state.status),
+        headers: this.state.headers.split(/\n/).filter(function(u) {
+          return u.match(/^.+:.+$/) != null
+        }).map(function(u: string) {
+          let index = u.indexOf(":")
+          return {
+            name: u.substring(0, index),
+            value: u.substring(index + 1).replace(/^ */, "")
+          }
+        }),
+        body: this.state.body
+      }
 
-    this.props.onSave(this.state.apiPath, this.state.apiName, this.state.condition, JSON.stringify(responseData))
+      this.props.onSave(this.state.apiPath, this.state.apiName, this.state.condition, JSON.stringify(responseData))
+    }
   }
 
   cancel() {
@@ -133,34 +135,40 @@ class ApiEditPane extends React.Component<ApiEditProps, ApiEditState> {
     })
   }
   clearHistory() {
-    this.props.onClearHistory(this.props.api)
+
+    if (confirm(`すべてのAPI(${this.props.api.apiPath})を呼び出した履歴を削除しますか？`)) {
+      this.props.onClearHistory(this.props.api)
+    }
   }
 
   delete() {
-    this.props.onDelete(this.props.api)
+    if (confirm(`API(${this.props.api.apiPath})を削除しますか？`))
+      this.props.onDelete(this.props.api)
   }
 
   save() {
-    let responseData : ResponseData = {
-      status: parseInt(this.state.status),
-      headers: this.state.headers.split(/\n/).filter(function(u) {
-        return u.match(/^.+:.+$/) != null
-      }).map(function(u: string) {
-        let index = u.indexOf(":")
-        return {
-          name: u.substring(0, index),
-          value: u.substring(index + 1).replace(/^ */, "")
-        }
-      }),
-      body: this.state.body
+    if (confirm("入力内容を保存しますか？")) {
+      let responseData : ResponseData = {
+        status: parseInt(this.state.status),
+        headers: this.state.headers.split(/\n/).filter(function(u) {
+          return u.match(/^.+:.+$/) != null
+        }).map(function(u: string) {
+          let index = u.indexOf(":")
+          return {
+            name: u.substring(0, index),
+            value: u.substring(index + 1).replace(/^ */, "")
+          }
+        }),
+        body: this.state.body
+      }
+
+      this.props.api.apiPath = this.state.apiPath
+      this.props.api.apiName = this.state.apiName
+      this.props.api.conditionJs = this.state.condition
+      this.props.api.responseJson = JSON.stringify(responseData)
+
+      this.props.onSave(this.props.api)
     }
-
-    this.props.api.apiPath = this.state.apiPath
-    this.props.api.apiName = this.state.apiName
-    this.props.api.conditionJs = this.state.condition
-    this.props.api.responseJson = JSON.stringify(responseData)
-
-    this.props.onSave(this.props.api)
   }
 
   cancel() {
@@ -287,7 +295,7 @@ export class ApiMgr extends React.Component<RouteComponentProps<ApiMgrRoutParm>,
     }
     this.state.apis!.create(props, {
       success: () => this.refreshApiList(),
-      error: errorHandler("作成処理が失敗しました。原因は以下です。\n")
+      error: errorHandler("作成処理が失敗しました。原因は以下です。\n", "", { refresh: () => this.refreshApiList() })
     })
   }
 
@@ -295,13 +303,13 @@ export class ApiMgr extends React.Component<RouteComponentProps<ApiMgrRoutParm>,
     let a = this.state.apis!.get(api.id)
     a.destroy({
       success: () => this.refreshApiList(),
-      error: errorHandler("削除処理が失敗しました。原因は以下です。\n")
+      error: errorHandler("削除処理が失敗しました。原因は以下です。\n", "", { refresh: () => this.refreshApiList() })
     })
   }
   updateApi(api: ApiModel) {
     api.save(null, {
       success: () => this.refreshApiList(),
-      error: errorHandler("保存処理は失敗しました。原因は以下です。\n")
+      error: errorHandler("保存処理は失敗しました。原因は以下です。\n", "", { refresh: () => this.refreshApiList() })
     })
   }
 
@@ -311,9 +319,9 @@ export class ApiMgr extends React.Component<RouteComponentProps<ApiMgrRoutParm>,
       method: "DELETE",
       success: (data: {result: boolean, message: string}) => {
         if (data.result) {
-          alert("Remove successed.")
+          alert(`API(${this.state.currentApi!.apiPath})の呼出履歴を削除しました。`)
         } else {
-          alert("Remove failed.")
+          alert("API(${this.state.currentApi!.apiPath})の呼出履歴を削除しません。")
         }
       }
     })

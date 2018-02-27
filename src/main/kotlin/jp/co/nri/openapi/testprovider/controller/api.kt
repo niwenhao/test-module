@@ -184,6 +184,15 @@ class HistoryServiceController(
         } ?: listOf<ProviderApiHist>()
     }
 
+    @RequestMapping("/{histId}", method = arrayOf(RequestMethod.GET))
+    fun getById(
+            session: HttpSession,
+            @PathVariable
+            histId: Long
+    ): ProviderApiHist? {
+        return histDao.findById(histId)
+    }
+
     @RequestMapping("/client", method = arrayOf(RequestMethod.DELETE))
     fun removeByClientId(
             session: HttpSession

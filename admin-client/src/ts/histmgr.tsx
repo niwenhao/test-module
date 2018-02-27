@@ -63,19 +63,25 @@ export class HistMgr extends React.Component<RouteComponentProps<any>, HistMgrSt
   }
 
   doDelete(hist: HistoryModel) {
-    let h = this.state.historyList!.get(hist.id)
-    let self = this
-    h.destroy({
-      success: () => {
-        this.setState({currentHistory: null})
-        this.refresh()
-      },
-      error: errorHandler("削除処理が失敗しました。原因は以下です。\n")
-    })
+    if (confirm(`表示している履歴を削除しますか？`)) {
+      let h = this.state.historyList!.get(hist.id)
+      let self = this
+      h.destroy({
+        success: () => {
+          this.setState({currentHistory: null})
+          this.refresh()
+        },
+        error: errorHandler("削除処理が失敗しました。原因は以下です。\n", "", { refresh: () => this.refresh() })
+      })
+    }
   }
 
   toSelect(hist: HistoryModel) {
-    this.setState({currentHistory: hist})
+    let h = new HistoryModel()
+    h.url = () => `/test-data-manager/api/hist/${hist.id}`
+    h.fetch({
+      success: () => this.setState({currentHistory: h})
+    })
   }
 
   render(): React.ReactNode {
@@ -131,10 +137,7 @@ export class HistMgr extends React.Component<RouteComponentProps<any>, HistMgrSt
                             <input type="radio" checked={id == h.id} value={h.id} onClick={() => self.toSelect(h)}/>
                           </td>
                           <td id="ts_column">{`${dt.toLocaleDateString()} ${dt.toLocaleTimeString()}`}</td>
-                          <td id="status_column">{function(h:HistoryModel){
-                            let resp = JSON.parse(h.responseJson)
-                            return <span>{resp.status}</span>
-                            }(h)}</td>
+                          <td id="status_column">{h.status}</td>
                         </tr>
                       )
                     })}

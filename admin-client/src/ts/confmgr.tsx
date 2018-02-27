@@ -25,7 +25,9 @@ namespace create {
       this.props.onCancel()
     }
     toSave() {
-      this.props.onSave(this.state.name, this.state.value)
+      if (confirm("入力内容を保存しますか？")) {
+        this.props.onSave(this.state.name, this.state.value)
+      }
     }
     render() {
       return (
@@ -77,14 +79,18 @@ namespace edit {
     }
 
     toDelete() {
-      this.props.onDelete(this.props.conf)
+      if (confirm(`設定(${this.props.conf.name})を削除しますか？`)) {
+        this.props.onDelete(this.props.conf)
+      }
     }
 
     toSave() {
-      let c = this.props.conf
-      c.name = this.state.name
-      c.value = this.state.value
-      this.props.onSave(c)
+      if (confirm("入力内容を保存しますか？")) {
+        let c = this.props.conf
+        c.name = this.state.name
+        c.value = this.state.value
+        this.props.onSave(c)
+      }
     }
 
     componentWillReceiveProps(nextProps: EditProps, nextContext: any) {
@@ -191,7 +197,7 @@ export class ConfigMgr extends React.Component<RouteComponentProps<any>, ConfigM
       value: value
     }, {
       success: () => this.doRefresh(),
-      error: errorHandler("保存処理は失敗しました。原因は以下です。\n")
+      error: errorHandler("保存処理は失敗しました。原因は以下です。\n", "", { refresh: () => this.doRefresh() })
     })
   }
 
@@ -200,7 +206,7 @@ export class ConfigMgr extends React.Component<RouteComponentProps<any>, ConfigM
     //this.state.configurations!.remove(c)
     c.destroy({ 
       success: () => this.doRefresh(),
-      error: errorHandler("削除処理は失敗しました。原因は以下です。\n")
+      error: errorHandler("削除処理は失敗しました。原因は以下です。\n", "", { refresh: () => this.doRefresh() })
     })
   }
 
@@ -209,7 +215,7 @@ export class ConfigMgr extends React.Component<RouteComponentProps<any>, ConfigM
     conf.save(null, 
       { 
         success: () => this.doRefresh(),
-        error: errorHandler("保存処理は失敗しました。原因は以下です。\n")
+        error: errorHandler("保存処理は失敗しました。原因は以下です。\n", "", { refresh: () => this.doRefresh() })
       })
   }
 

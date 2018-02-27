@@ -38,16 +38,18 @@ class UserEditor extends React.Component<UserEditorProps, UserEditorState> {
   }
 
   update() {
-    this.props.user.userName = this.state.userName
-    this.props.user.userID = this.state.userID
-    this.props.user.password = this.state.password
+    if (confirm("入力内容を保存しますか？")) {
+      this.props.user.userName = this.state.userName
+      this.props.user.userID = this.state.userID
+      this.props.user.password = this.state.password
 
-    this.props.user.save(null, { success: () => {
-        console.log(`success to update usermodel`)
-        this.props.onUpdate()
-      },
-      error: errorHandler("保存処理は失敗しました。原因は以下です。\n")
-    })
+      this.props.user.save(null, { success: () => {
+          console.log(`success to update usermodel`)
+          this.props.onUpdate()
+        },
+        error: errorHandler("保存処理は失敗しました。原因は以下です。\n", "", { refresh: () => this.props.onUpdate() })
+      })
+    }
   }
 
   componentWillReceiveProps(props: UserEditorProps, nextContext: any) {
@@ -218,40 +220,46 @@ export class UserMgr
   }
 
   createUser(id: string, name: string, pwd: string) {
-    let u = new UserModel({
-      userID: id,
-      userName: name,
-      password: pwd
-    })
+    if (confirm("入力内容を保存しますか？")) {
+      let u = new UserModel({
+        userID: id,
+        userName: name,
+        password: pwd
+      })
 
-    this.state.users!.create(u, {
-      success: () => {
-        this.refreshUserList()
-      },
-      error: errorHandler("ユーザ作成が失敗しました。原因は以下です。\n")
-    })
+      this.state.users!.create(u, {
+        success: () => {
+          this.refreshUserList()
+        },
+        error: errorHandler("ユーザ作成が失敗しました。原因は以下です。\n", "", { refresh: () => this.refreshUserList() })
+      })
+    }
   }
 
   removeUser(user:UserModel) {
-    let u = this.state.users!.get(user.id)
-    u.destroy({
-      success: () => this.refreshUserList(),
-      error: errorHandler("ユーザ削除が失敗しました。原因は以下です。\n")
-    })
+    if (confirm(`ユーザ(${user.userID})を削除しますか？`)) {
+      let u = this.state.users!.get(user.id)
+      u.destroy({
+        success: () => this.refreshUserList(),
+        error: errorHandler("ユーザ削除が失敗しました。原因は以下です。\n", "", { refresh: () => this.refreshUserList() })
+      })
+    }
   }
 
   clearUserHistory(user: UserModel) {
-    JQuery.ajax({
-      url: `/test-data-manager/api/hist/user/${user.id}`,
-      method: "DELETE",
-      success: (data: {result: boolean, message: string}) => {
-        if (data.result) {
-          alert("Remove successed.")
-        } else {
-          alert("Remove failed.")
+    if (confirm(`ユーザ(${user.userID})のすべてのAPI呼出し履歴を削除しますか？`)) {
+      JQuery.ajax({
+        url: `/test-data-manager/api/hist/user/${user.id}`,
+        method: "DELETE",
+        success: (data: {result: boolean, message: string}) => {
+          if (data.result) {
+            alert(`ユーザ（${this.state.currentUser!.userName}）のAPIの呼出履歴情報を削除しました。`)
+          } else {
+            alert(`ユーザ(${this.state.currentUser!.userName})のAPI呼出履歴の削除が失敗しました。`)
+          }
         }
-      }
-    })
+      })
+    }
   }
 
   selectUser(u:UserModel) {
@@ -262,17 +270,19 @@ export class UserMgr
   }
 
   clearAllHistory() {
-    JQuery.ajax({
-      url: "/test-data-manager/api/hist/client",
-      method: "DELETE",
-      success: (data: {result: boolean, message: string}) => {
-        if (data.result) {
-          alert("Remove successed.")
-        } else {
-          alert("Remove failed.")
+    if (confirm(`クライアントキー(${this.state.client})のすべてのAPI呼び出し履歴を削除しますか？`)) {
+      JQuery.ajax({
+        url: "/test-data-manager/api/hist/client",
+        method: "DELETE",
+        success: (data: {result: boolean, message: string}) => {
+          if (data.result) {
+            alert(`クライアント定義(${this.state.client})のAPIの呼出履歴情報を削除しました。`)
+          } else {
+            alert(`クライアント定義(${this.state.client})のAPI呼出履歴の削除が失敗しました。`)
+          }
         }
-      }
-    })
+      })
+    }
   }
 
   showApi(u: UserModel) {

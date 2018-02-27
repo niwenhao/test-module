@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "deploy": "gulp && browserify midjs/main.js -o ../src/main/resources/static/test-data-manager/cont/admin.js && lessc src/css/styles.less > ../src/main/resources/static/test-data-manager/cont/styles.css && cd .. && gradle build"
+    "deploy": "gulp && browserify midjs/main.js -o ../src/main/resources/static/test-data-manager/cont/admin.js && lessc src/css/styles.less > ../src/main/resources/static/test-data-manager/cont/styles.css && cd .. && gradle bootRepackage",
+    "scp": "scp ../build/libs/test-module-0.1.jar dev@192.168.56.51:/home/dev/workspace/ca-gateway/."
   },
   "author": "",
   "license": "ISC",

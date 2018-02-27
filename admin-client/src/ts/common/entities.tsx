@@ -1,11 +1,17 @@
 import * as Backbone from 'backbone'
 
+/**
+ * ユーザエンティティ
+ */
 export interface User {
   userID: string
   userName: string
   password: string
 }
 
+/**
+ * BackboneのプロパティをUserエンティティに統一する。
+ */
 export class UserModel extends Backbone.Model implements User {
   constructor(attrs?: User, options?: any) {
     super(attrs || {}, options)
@@ -34,7 +40,11 @@ export class UserModel extends Backbone.Model implements User {
   }
 }
 
+/**
+ * Backboneのコレクション実装
+ */
 export class UserCollection extends Backbone.Collection<UserModel> {
+  //Restful URLを提供する。
   url = "/test-data-manager/api/users"
 
   model = UserModel
@@ -120,6 +130,14 @@ export interface History {
 export class HistoryModel extends Backbone.Model implements History {
   constructor(attrs?: any, options?:any) {
     super(attrs, options)
+  }
+
+  get status(): number {
+    return this.get('status')
+  }
+
+  set status(v:number) {
+    this.set('status', v)
   }
 
   get accessTime(): number {
@@ -214,8 +232,9 @@ export type ResponseData = {
       body: string
     }
 
-export function errorHandler(prefix:string = "", postfix:string = "") {
+export function errorHandler(prefix:string = "", postfix:string = "", opts:any = {}) {
   return function(model: any, xhr: any, options: any) {
     alert(`${prefix}${xhr.responseJSON.message}${postfix}`)
+    opts.refresh && opts.refresh()
   }
 }
